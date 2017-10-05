@@ -47,3 +47,8 @@ func (c *Connection) Transaction(fn func(*Connection) error) error {
 	d.Commit()
 	return nil
 }
+
+// Close disconnects from the database.
+func (c *Connection) Close() {
+	c.C.Close()
+}
