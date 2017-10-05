@@ -9,6 +9,12 @@ This web application simplifies the task of managing a group of anon Twitter acc
 - Staff can approve tweets and schedule them
 - Tweets are automatically tweeted on schedule
 
-### Installation
+### Building
 
-TODO
+Assuming you have Docker and GNU Make installed, building the entire application is as simple as running:
+
+    make
+
+The makefile uses the `golang:latest` container to compile the application, so there is no need to have the Go toolchain installed locally. Once compilation is complete, you can run the application with:
+
+    dist/anonbot
