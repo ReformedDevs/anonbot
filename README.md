@@ -15,6 +15,6 @@ Assuming you have Docker and GNU Make installed, building the entire application
 
     make
 
-The makefile uses the `golang:latest` container to compile the application, so there is no need to have the Go toolchain installed locally. Once compilation is complete, you can run the application with:
+The makefile uses the `golang:latest` container to compile the application, so there is no need to have the Go toolchain installed locally. Once compilation is complete, you can run the application and view usage instructions with:
 
-    dist/anonbot
+    dist/anonbot --help
