@@ -6,22 +6,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const (
-	UserTypeRegular = "regular"
-	UserTypeStaff   = "staff"
-	UserTypeAdmin   = "admin"
-)
-
 // User represents an individual user that can login to the website. Regular
-// users are able to suggest tweets and staff are able to edit and queue them.
-// Administrators are able to add and remove users.
+// admins are able to suggest tweets and staff are able to edit and queue them.
 //
 // Passwords are salted and hashed with bcrypt.
 type User struct {
 	ID       int64
 	Username string `gorm:"not null;unique_index"`
 	Password string `gorm:"not null"`
-	Type     string `gorm:"not null"`
+	IsAdmin  bool
 }
 
 // Authenticate hashes the password and compares it to the value stored in the
