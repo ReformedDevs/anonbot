@@ -18,3 +18,11 @@ Assuming you have Docker and GNU Make installed, building the entire application
 The makefile uses the `golang:latest` container to compile the application, so there is no need to have the Go toolchain installed locally. Once compilation is complete, you can run the application and view usage instructions with:
 
     dist/anonbot --help
+
+### Using with Docker
+
+Once built, the application can easily be run in a Docker container. Simply open a terminal and run:
+
+    docker build -t ReformedDevs/anonbot .
+
+[TODO: describe container env. variables]
