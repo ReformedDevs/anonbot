@@ -1,0 +1,8 @@
+/**
+ * Custom CSS Rules
+ */
+
+body { background-color: #dadada; }
+
+.login { height: 100%; }
+.login .column { max-width: 400px; }
