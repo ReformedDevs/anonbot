@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/ReformedDevs/anonbot/db"
 	"github.com/flosch/pongo2"
@@ -26,17 +27,20 @@ func (s *Server) newAccount(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		for {
 			var (
-				name           = r.Form.Get("name")
-				consumerKey    = r.Form.Get("consumer_key")
-				consumerSecret = r.Form.Get("consumer_secret")
-				accessToken    = r.Form.Get("access_token")
-				accessSecret   = r.Form.Get("access_secret")
-				a              = &db.Account{
+				name                = r.Form.Get("name")
+				consumerKey         = r.Form.Get("consumer_key")
+				consumerSecret      = r.Form.Get("consumer_secret")
+				accessToken         = r.Form.Get("access_token")
+				accessSecret        = r.Form.Get("access_secret")
+				tweetInterval       = r.Form.Get("tweet_interval")
+				tweetIntervalInt, _ = strconv.ParseInt(tweetInterval, 10, 64)
+				a                   = &db.Account{
 					Name:           name,
 					ConsumerKey:    consumerKey,
 					ConsumerSecret: consumerSecret,
 					AccessToken:    accessToken,
 					AccessSecret:   accessSecret,
+					TweetInterval:  tweetIntervalInt,
 				}
 			)
 			ctx["name"] = name
@@ -44,6 +48,7 @@ func (s *Server) newAccount(w http.ResponseWriter, r *http.Request) {
 			ctx["consumer_secret"] = consumerSecret
 			ctx["access_token"] = accessToken
 			ctx["access_secret"] = accessSecret
+			ctx["tweet_interval"] = tweetInterval
 			if len(name) == 0 {
 				ctx["error"] = "invalid name"
 				break
