@@ -1,5 +1,10 @@
 package db
 
+const (
+	TweetInterval        = "tweet_interval"
+	TweetIntervalDefault = "86400"
+)
+
 // Setting represents a configurable value in the database.
 type Setting struct {
 	Key   string `gorm:"primary_key"`
