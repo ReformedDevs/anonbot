@@ -26,6 +26,11 @@
                     <a href="/suggestions" class="item">
                         Suggestions
                     </a>
+                    {% if user.IsAdmin %}
+                        <a href="/accounts" class="item">
+                            Accounts
+                        </a>
+                    {% endif %}
                     <div class="right menu">
                         {% if user %}
                             <a href="/logout" class="item">

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>New Account</h2>
+        <p>Use the form below to create a new account:</p>
+        {% if error %}
+            <div class="ui error message">
+                Error: {{ error }}
+            </div>
+        {% endif %}
+        <form class="ui form" method="post">
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="tag icon"></i>
+                    <input type="text" placeholder="Name" name="name" value="{{ name }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="privacy icon"></i>
+                    <input type="text" placeholder="Consumer key" name="consumer_key" value="{{ consumer_key }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="privacy icon"></i>
+                    <input type="text" placeholder="Consumer secret" name="consumer_secret" value="{{ consumer_secret }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="privacy icon"></i>
+                    <input type="text" placeholder="Access token" name="access_token" value="{{ access_token }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="privacy icon"></i>
+                    <input type="text" placeholder="Access secret" name="access_secret" value="{{ access_secret }}">
+                </div>
+            </div>
+            <button type="submit" class="ui fluid large primary button">Create</button>
+        </form>
+    </div>
+{% endblock %}
