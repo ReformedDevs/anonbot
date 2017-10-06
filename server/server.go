@@ -4,6 +4,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/ReformedDevs/anonbot/db"
 	"github.com/flosch/pongo2"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -15,6 +16,8 @@ import (
 // permissions.
 type Server struct {
 	listener    net.Listener
+	database    *db.Connection
+	router      *mux.Router
 	store       *sessions.CookieStore
 	templateSet *pongo2.TemplateSet
 	log         *logrus.Entry
@@ -28,19 +31,23 @@ func New(cfg *Config) (*Server, error) {
 		return nil, err
 	}
 	var (
-		router = mux.NewRouter()
-		server = http.Server{
-			Handler: router,
-		}
 		s = &Server{
 			listener:    l,
+			database:    cfg.Database,
+			router:      mux.NewRouter(),
 			store:       sessions.NewCookieStore([]byte(cfg.SecretKey)),
 			templateSet: pongo2.NewSet("", &b0xLoader{}),
 			log:         logrus.WithField("context", "server"),
 			stopped:     make(chan bool),
 		}
+		server = http.Server{
+			Handler: s,
+		}
 	)
-	router.PathPrefix("/static").Handler(http.FileServer(HTTP))
+	s.router.HandleFunc("/", s.index)
+	s.router.HandleFunc("/login", s.login)
+	s.router.HandleFunc("/logout", s.requireLogin(s.logout))
+	s.router.PathPrefix("/static").Handler(http.FileServer(HTTP))
 	go func() {
 		defer close(s.stopped)
 		defer s.log.Info("web server has stopped")
@@ -50,6 +57,20 @@ func New(cfg *Config) (*Server, error) {
 		}
 	}()
 	return s, nil
+}
+
+// ServeHTTP does preparatory work for the handlers. It attempts to load the
+// user from the database if authenticated and ensures that POST requests have
+// their forms parsed.
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	r = s.loadUser(r)
+	s.router.ServeHTTP(w, r)
 }
 
 // Close shuts down the server and waits for it to complete.

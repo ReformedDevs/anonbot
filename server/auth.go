@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/ReformedDevs/anonbot/db"
@@ -8,9 +9,33 @@ import (
 )
 
 const (
+	contextUser = "user"
+
 	sessionName   = "session"
 	sessionUserID = "userID"
 )
+
+func (s *Server) loadUser(r *http.Request) *http.Request {
+	session, _ := s.store.Get(r, sessionName)
+	v, _ := session.Values[sessionUserID]
+	if v != "" {
+		u := &db.User{}
+		if err := s.database.C.First(u, v).Error; err == nil {
+			r = r.WithContext(context.WithValue(r.Context(), contextUser, u))
+		}
+	}
+	return r
+}
+
+func (s *Server) requireLogin(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Context().Value(contextUser) == nil {
+			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			return
+		}
+		fn(w, r)
+	}
+}
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	ctx := pongo2.Context{

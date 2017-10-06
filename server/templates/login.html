@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 
+{% block stylesheets %}
+    {{ block.Super|safe }}
+    <style>
+        body { background-color: #dadada; }
+        .login { height: 100%; }
+        .login .column { max-width: 400px; }
+    </style>
+{% endblock %}
+
+{% block navbar %}{% endblock %}
+
 {% block content %}
     <div class="ui middle aligned center aligned grid login">
         <div class="column">

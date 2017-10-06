@@ -11,10 +11,36 @@
             {% endif %}
         </title>
 
-        <link rel="stylesheet" href="/static/css/semantic.min.css">
-        <link rel="stylesheet" href="/static/css/anonbot.css">
+        {% block stylesheets %}
+            <link rel="stylesheet" href="/static/css/semantic.min.css">
+            <link rel="stylesheet" href="/static/css/anonbot.css">
+        {% endblock %}
     </head>
     <body>
+        {% block navbar %}
+            <div class="ui container">
+                <div class="ui secondary pointing menu">
+                    <a href="/" class="item">
+                        anonbot
+                    </a>
+                    <a href="/suggestions" class="item">
+                        Suggestions
+                    </a>
+                    <div class="right menu">
+                        <a href="/login" class="item">
+                            Login
+                        </a>
+                        <a href="/register" class="item">
+                            Register
+                        </a>
+                        <a href="/logout" class="item">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+
         {% block content %}{% endblock %}
 
         <script src="/static/js/jquery.min.js"></script>
