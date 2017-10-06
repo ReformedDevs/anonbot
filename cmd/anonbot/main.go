@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/ReformedDevs/anonbot/db"
 	"github.com/ReformedDevs/anonbot/server"
+	"github.com/howeyc/gopass"
 	"github.com/urfave/cli"
 )
 
@@ -37,6 +39,58 @@ func main() {
 			Value:  ":8000",
 			EnvVar: "SERVER_ADDR",
 			Usage:  "server driver",
+		},
+	}
+	app.Commands = []cli.Command{
+		{
+			Name:  "createadmin",
+			Usage: "create an admin user",
+			Action: func(c *cli.Context) error {
+
+				// Create the database connection
+				d, err := db.Connect(&db.Config{
+					Driver: c.String("db-driver"),
+					Args:   c.String("db-args"),
+				})
+				if err != nil {
+					return err
+				}
+				defer d.Close()
+
+				// Prompt for username
+				var username string
+				fmt.Print("Username? ")
+				fmt.Scanln(&username)
+
+				// Prompt for the password, hiding the input
+				fmt.Print("Password? ")
+				p, err := gopass.GetPasswd()
+				if err != nil {
+					return err
+				}
+
+				// Prompt for email address
+				var email string
+				fmt.Print("Email? ")
+				fmt.Scanln(&email)
+
+				// Create the new user
+				u := &db.User{
+					Username: username,
+					Email:    email,
+					IsAdmin:  true,
+				}
+				if err := u.SetPassword(string(p)); err != nil {
+					return err
+				}
+
+				// Store the user in the database
+				if err := d.C.Create(u).Error; err != nil {
+					return err
+				}
+
+				return nil
+			},
 		},
 	}
 	app.Action = func(c *cli.Context) error {
