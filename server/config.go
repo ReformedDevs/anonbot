@@ -6,6 +6,7 @@ import (
 
 // Config provides parameters for hosting the website.
 type Config struct {
-	Addr     string
-	Database *db.Connection
+	Addr      string
+	SecretKey string
+	Database  *db.Connection
 }

@@ -28,6 +28,11 @@ func main() {
 			Usage:  "database driver",
 		},
 		cli.StringFlag{
+			Name:   "secret-key",
+			EnvVar: "SECRET_KEY",
+			Usage:  "secret key",
+		},
+		cli.StringFlag{
 			Name:   "server-addr",
 			Value:  ":8000",
 			EnvVar: "SERVER_ADDR",
