@@ -22,11 +22,5 @@
                 Please either <a href="/register">register</a> or <a href="/login">login</a> to continue.
             </p>
         {% endif %}
-        <div class="ui divider"></div>
-        <h3>Accounts</h3>
-        <p>The following accounts are managed by this instance:</p>
-        {% for a in accounts %}
-            <div>{{ a.Name }}</div>
-        {% endfor %}
     </div>
 {% endblock %}
