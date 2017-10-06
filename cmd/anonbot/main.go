@@ -49,8 +49,8 @@ func main() {
 
 				// Create the database connection
 				d, err := db.Connect(&db.Config{
-					Driver: c.String("db-driver"),
-					Args:   c.String("db-args"),
+					Driver: c.GlobalString("db-driver"),
+					Args:   c.GlobalString("db-args"),
 				})
 				if err != nil {
 					return err
@@ -90,6 +90,25 @@ func main() {
 				}
 
 				return nil
+			},
+		},
+		{
+			Name:  "migrate",
+			Usage: "perform all database migrations",
+			Action: func(c *cli.Context) error {
+
+				// Create the database connection
+				d, err := db.Connect(&db.Config{
+					Driver: c.GlobalString("db-driver"),
+					Args:   c.GlobalString("db-args"),
+				})
+				if err != nil {
+					return err
+				}
+				defer d.Close()
+
+				// Perform all migrations
+				return d.Migrate()
 			},
 		},
 	}
