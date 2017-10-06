@@ -4,6 +4,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/flosch/pongo2"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
@@ -13,10 +14,11 @@ import (
 // login, post suggestions, and queue items if they have the appropriate
 // permissions.
 type Server struct {
-	listener net.Listener
-	store    *sessions.CookieStore
-	log      *logrus.Entry
-	stopped  chan bool
+	listener    net.Listener
+	store       *sessions.CookieStore
+	templateSet *pongo2.TemplateSet
+	log         *logrus.Entry
+	stopped     chan bool
 }
 
 // New creates a new server with the specified configuration.
@@ -31,10 +33,11 @@ func New(cfg *Config) (*Server, error) {
 			Handler: router,
 		}
 		s = &Server{
-			listener: l,
-			store:    sessions.NewCookieStore([]byte(cfg.SecretKey)),
-			log:      logrus.WithField("context", "server"),
-			stopped:  make(chan bool),
+			listener:    l,
+			store:       sessions.NewCookieStore([]byte(cfg.SecretKey)),
+			templateSet: pongo2.NewSet("", &b0xLoader{}),
+			log:         logrus.WithField("context", "server"),
+			stopped:     make(chan bool),
 		}
 	)
 	router.PathPrefix("/static").Handler(http.FileServer(HTTP))
