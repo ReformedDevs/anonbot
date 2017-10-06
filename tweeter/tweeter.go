@@ -7,7 +7,7 @@ import (
 // Tweeter takes care of sending tweets at regularly scheduled intervals.
 type Tweeter struct {
 	log       *logrus.Entry
-	stopCh    chan bool
+	triggerCh chan bool
 	stoppedCh chan bool
 }
 
@@ -17,8 +17,10 @@ func (t *Tweeter) run() {
 	t.log.Info("starting tweeter...")
 	for {
 		select {
-		case <-t.stopCh:
-			return
+		case _, ok := <-t.triggerCh:
+			if !ok {
+				return
+			}
 		}
 	}
 }
@@ -27,15 +29,20 @@ func (t *Tweeter) run() {
 func New() (*Tweeter, error) {
 	t := &Tweeter{
 		log:       logrus.WithField("context", "tweeter"),
-		stopCh:    make(chan bool),
+		triggerCh: make(chan bool),
 		stoppedCh: make(chan bool),
 	}
 	go t.run()
 	return t, nil
 }
 
+// Trigger hints to the tweeter that a new tweet is available in the database.
+func (t *Tweeter) Trigger() {
+	t.triggerCh <- true
+}
+
 // Close shuts down the tweeter.
 func (t *Tweeter) Close() {
-	close(t.stopCh)
+	close(t.triggerCh)
 	<-t.stoppedCh
 }

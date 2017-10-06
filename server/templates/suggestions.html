@@ -10,6 +10,9 @@
                     <th>Account</th>
                     <th>Text</th>
                     <th>Author</th>
+                    {% if user.IsAdmin %}
+                        <th class="right aligned">Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -17,15 +20,33 @@
                     <tr>
                         <td>{{ s.Account.Name }}</td>
                         <td>{{ s.Text }}</td>
-                        <td>
-                            <img class="ui avatar image" src="//gravatar.com/avatar/{{ s.User.Email|md5 }}?s=32&d=identicon">
-                            &nbsp;
-                            {{ s.User.Username }}
+                        <td class="collapsing">
+                            <div class="ui mini horizontal list">
+                                <div class="item">
+                                    <img class="ui avatar image" src="//gravatar.com/avatar/{{ s.User.Email|md5 }}?s=32&d=identicon">
+                                    <div class="content">
+                                        <div class="ui sub header">
+                                            {{ s.User.Username }}
+                                        </div>
+                                        {{ s.Date }}
+                                    </div>
+                                </div>
+                            </div>
                         </td>
+                        {% if user.IsAdmin %}
+                            <td class="collapsing">
+                                <form action="/suggestions/queue" method="post">
+                                    <input type="hidden" name="id" value="{{ s.ID }}">
+                                    <button type="submit" class="ui primary mini button">
+                                        Queue
+                                    </button>
+                                </form>
+                            </td>
+                        {% endif %}
                     </tr>
                 {% empty %}
                     <tr class="disabled">
-                        <td colspan="3">
+                        <td colspan="{% if user.IsAdmin %}4{% else %}3{% endif %}">
                             No suggestions
                         </td>
                     </tr>
@@ -33,7 +54,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="3">
+                    <th colspan="{% if user.IsAdmin %}4{% else %}3{% endif %}">
                         <a href="/suggestions/new" class="ui primary mini button">
                             New
                         </a>
