@@ -11,7 +11,7 @@ import (
 
 func (s *Server) suggestions(w http.ResponseWriter, r *http.Request) {
 	suggestions := []*db.Suggestion{}
-	if err := s.database.C.Find(&suggestions).Error; err != nil {
+	if err := s.database.C.Preload("User").Preload("Account").Find(&suggestions).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

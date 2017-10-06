@@ -3,6 +3,43 @@
 {% block content %}
     <div class="ui container">
         <h2>Suggestions</h2>
-        <p>The list below shows all current suggestions:</p>
+        <p>The table below shows all current suggestions:</p>
+        <table class="ui single line table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Text</th>
+                    <th>Author</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in suggestions %}
+                    <tr>
+                        <td>{{ s.Account.Name }}</td>
+                        <td>{{ s.Text }}</td>
+                        <td>
+                            <img class="ui avatar image" src="//gravatar.com/avatar/{{ s.User.Email|md5 }}?s=32&d=identicon">
+                            &nbsp;
+                            {{ s.User.Username }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="disabled">
+                        <td colspan="3">
+                            No suggestions
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3">
+                        <a href="/suggestions/new" class="ui primary mini button">
+                            New
+                        </a>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 {% endblock %}
