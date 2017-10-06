@@ -21,7 +21,7 @@ type Server struct {
 	store       *sessions.CookieStore
 	templateSet *pongo2.TemplateSet
 	log         *logrus.Entry
-	stopped     chan bool
+	stoppedCh   chan bool
 }
 
 // New creates a new server with the specified configuration.
@@ -38,7 +38,7 @@ func New(cfg *Config) (*Server, error) {
 			store:       sessions.NewCookieStore([]byte(cfg.SecretKey)),
 			templateSet: pongo2.NewSet("", &b0xLoader{}),
 			log:         logrus.WithField("context", "server"),
-			stopped:     make(chan bool),
+			stoppedCh:   make(chan bool),
 		}
 		server = http.Server{
 			Handler: s,
@@ -55,7 +55,7 @@ func New(cfg *Config) (*Server, error) {
 	s.router.HandleFunc("/accounts/delete", s.requireAdmin(s.deleteAccount))
 	s.router.PathPrefix("/static").Handler(http.FileServer(HTTP))
 	go func() {
-		defer close(s.stopped)
+		defer close(s.stoppedCh)
 		defer s.log.Info("web server has stopped")
 		s.log.Info("starting web server...")
 		if err := server.Serve(l); err != nil {
@@ -82,5 +82,5 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Close shuts down the server and waits for it to complete.
 func (s *Server) Close() {
 	s.listener.Close()
-	<-s.stopped
+	<-s.stoppedCh
 }

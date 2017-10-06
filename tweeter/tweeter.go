@@ -1,0 +1,41 @@
+package tweeter
+
+import (
+	"github.com/sirupsen/logrus"
+)
+
+// Tweeter takes care of sending tweets at regularly scheduled intervals.
+type Tweeter struct {
+	log       *logrus.Entry
+	stopCh    chan bool
+	stoppedCh chan bool
+}
+
+func (t *Tweeter) run() {
+	defer close(t.stoppedCh)
+	defer t.log.Info("tweeter has stopped")
+	t.log.Info("starting tweeter...")
+	for {
+		select {
+		case <-t.stopCh:
+			return
+		}
+	}
+}
+
+// New creates a new tweeter instance.
+func New() (*Tweeter, error) {
+	t := &Tweeter{
+		log:       logrus.WithField("context", "tweeter"),
+		stopCh:    make(chan bool),
+		stoppedCh: make(chan bool),
+	}
+	go t.run()
+	return t, nil
+}
+
+// Close shuts down the tweeter.
+func (t *Tweeter) Close() {
+	close(t.stopCh)
+	<-t.stoppedCh
+}

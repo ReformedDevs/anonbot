@@ -8,6 +8,7 @@ import (
 
 	"github.com/ReformedDevs/anonbot/db"
 	"github.com/ReformedDevs/anonbot/server"
+	"github.com/ReformedDevs/anonbot/tweeter"
 	"github.com/howeyc/gopass"
 	"github.com/urfave/cli"
 )
@@ -124,10 +125,18 @@ func main() {
 		}
 		defer d.Close()
 
+		// Create the tweeter
+		t, err := tweeter.New()
+		if err != nil {
+			return err
+		}
+		defer t.Close()
+
 		// Create the server
 		s, err := server.New(&server.Config{
 			Addr:     c.String("server-addr"),
 			Database: d,
+			Tweeter:  t,
 		})
 		if err != nil {
 			return err
