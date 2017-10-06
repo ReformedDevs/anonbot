@@ -2,4 +2,6 @@
  * Custom CSS Rules
  */
 
+.menu .item:first-child { padding-left: 0 !important; }
+.menu .item:last-child { padding-right: 0 !important; }
 .navbar { margin-bottom: 20px; }
