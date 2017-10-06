@@ -2,5 +2,31 @@
 
 {% block content %}
     <div class="ui container">
+        <h2>anonbot</h2>
+        <p>
+            anonbot is a tool that simplifies the management of anon Twitter accounts by multiple individuals.
+        </p>
+        <p>This tool provides the following features:</p>
+        <ul>
+            <li>Users can register and suggest tweets</li>
+            <li>Admins can edit and queue tweets</li>
+            <li>Multiple accounts are supported</li>
+            <li>Source code <a href="https://github.com/ReformedDevs/anonbot" target="_blank">available on GitHub</a></li>
+        </ul>
+        {% if user %}
+            <p>
+                You are logged in and can <a href="/suggestions/new">suggest a tweet</a>.
+            </p>
+        {% else %}
+            <p>
+                Please either <a href="/register">register</a> or <a href="/login">login</a> to continue.
+            </p>
+        {% endif %}
+        <div class="ui divider"></div>
+        <h3>Accounts</h3>
+        <p>The following accounts are managed by this instance:</p>
+        {% for a in accounts %}
+            <div>{{ a.Name }}</div>
+        {% endfor %}
     </div>
 {% endblock %}
