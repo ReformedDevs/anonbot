@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui middle aligned center aligned grid login">
+        <div class="column">
+            <form class="ui large form" method="post">
+                <div class="ui padded segment">
+                    <h2 class="ui header">
+                        Login
+                    </h2>
+                    {% if error %}
+                        <div class="ui negative message">
+                            Error: {{ error }}
+                        </div>
+                    {% endif %}
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" placeholder="Username" name="username">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" placeholder="Password" name="password">
+                        </div>
+                    </div>
+                    <button type="submit" class="ui fluid large primary button">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
