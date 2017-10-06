@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/sirupsen/logrus"
 
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -9,7 +10,8 @@ import (
 // Connection represents a socket connection to the database. The C member may
 // be used directly to perform queries.
 type Connection struct {
-	C *gorm.DB
+	C   *gorm.DB
+	log *logrus.Entry
 }
 
 // Connect makes an attempt to connect to the database using the provided
@@ -19,13 +21,17 @@ func Connect(cfg *Config) (*Connection, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Connection{
-		C: d,
-	}, nil
+	c := &Connection{
+		C:   d,
+		log: logrus.WithField("context", "db"),
+	}
+	c.log.Info("connected to database")
+	return c, nil
 }
 
 // Migrate performs all pending database migrations.
 func (c *Connection) Migrate() error {
+	c.log.Info("performing migrations...")
 	return c.C.AutoMigrate(
 		&User{},
 		&Account{},
@@ -40,7 +46,7 @@ func (c *Connection) Migrate() error {
 // none occurs.
 func (c *Connection) Transaction(fn func(*Connection) error) error {
 	d := c.C.Begin()
-	if err := fn(&Connection{C: d}); err != nil {
+	if err := fn(&Connection{C: d, log: c.log}); err != nil {
 		d.Rollback()
 		return err
 	}
