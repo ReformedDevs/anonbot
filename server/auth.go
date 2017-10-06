@@ -47,6 +47,8 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 			password = r.Form.Get("password")
 			u        = &db.User{}
 		)
+		ctx["username"] = username
+		ctx["password"] = password
 		if err := s.database.C.Where("username = ?", username).First(&u).Error; err == nil {
 			if err := u.Authenticate(password); err == nil {
 				session, _ := s.store.Get(r, sessionName)
