@@ -7,7 +7,7 @@ import (
 )
 
 // User represents an individual user that can login to the website. Regular
-// admins are able to suggest tweets and staff are able to edit and queue them.
+// users are able to suggest tweets and admins are able to edit and queue them.
 //
 // Passwords are salted and hashed with bcrypt. The email address is used for
 // displaying gravatars and password resets.
