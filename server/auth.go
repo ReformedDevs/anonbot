@@ -37,6 +37,16 @@ func (s *Server) requireLogin(fn http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+func (s *Server) requireAdmin(fn http.HandlerFunc) http.HandlerFunc {
+	return s.requireLogin(func(w http.ResponseWriter, r *http.Request) {
+		if !r.Context().Value(contextUser).(*db.User).IsAdmin {
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
+		}
+		fn(w, r)
+	})
+}
+
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	ctx := pongo2.Context{
 		"title": "Login",
