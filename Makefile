@@ -27,7 +27,7 @@ dist/${CMD}: ${SOURCES} server/ab0x.go | cache/lib cache/src/${PKG} dist
 	    go get -pkgdir /go/lib ${PKG}/cmd/${CMD}
 
 # Create a Go source file with the static files and templates
-server/ab0x.go: dist/fileb0x b0x.yaml
+server/ab0x.go: ${RESOURCES} dist/fileb0x b0x.yaml
 	@dist/fileb0x b0x.yaml
 
 # Create the fileb0x executable needed for embedding files
