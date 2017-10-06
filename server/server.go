@@ -34,6 +34,7 @@ func New(cfg *Config) (*Server, error) {
 			stopped:  make(chan bool),
 		}
 	)
+	router.PathPrefix("/static").Handler(http.FileServer(HTTP))
 	go func() {
 		defer close(s.stopped)
 		defer s.log.Info("web server has stopped")
