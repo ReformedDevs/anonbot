@@ -126,10 +126,9 @@ func main() {
 		defer d.Close()
 
 		// Create the tweeter
-		t, err := tweeter.New()
-		if err != nil {
-			return err
-		}
+		t := tweeter.New(&tweeter.Config{
+			Database: d,
+		})
 		defer t.Close()
 
 		// Create the server

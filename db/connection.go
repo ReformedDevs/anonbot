@@ -38,7 +38,6 @@ func (c *Connection) Migrate() error {
 		&Suggestion{},
 		&QueueItem{},
 		&Tweet{},
-		&Setting{},
 	).Error
 }
 
