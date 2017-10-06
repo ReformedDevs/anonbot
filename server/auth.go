@@ -13,6 +13,8 @@ const (
 
 	sessionName   = "session"
 	sessionUserID = "userID"
+
+	invalidCredentials = "invalid username or password"
 )
 
 func (s *Server) loadUser(r *http.Request) *http.Request {
@@ -47,30 +49,80 @@ func (s *Server) requireAdmin(fn http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
+func (s *Server) loginUser(w http.ResponseWriter, r *http.Request, u *db.User) {
+	session, _ := s.store.Get(r, sessionName)
+	session.Values[sessionUserID] = u.ID
+	session.Save(r, w)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	ctx := pongo2.Context{
 		"title": "Login",
 	}
 	if r.Method == http.MethodPost {
-		var (
-			username = r.Form.Get("username")
-			password = r.Form.Get("password")
-			u        = &db.User{}
-		)
-		ctx["username"] = username
-		ctx["password"] = password
-		if err := s.database.C.Where("username = ?", username).First(&u).Error; err == nil {
-			if err := u.Authenticate(password); err == nil {
-				session, _ := s.store.Get(r, sessionName)
-				session.Values[sessionUserID] = u.ID
-				session.Save(r, w)
-				http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-				return
+		for {
+			var (
+				username = r.Form.Get("username")
+				password = r.Form.Get("password")
+				u        = &db.User{}
+			)
+			ctx["username"] = username
+			ctx["password"] = password
+			if err := s.database.C.Where("username = ?", username).First(&u).Error; err != nil {
+				ctx["error"] = invalidCredentials
+				break
 			}
+			if err := u.Authenticate(password); err != nil {
+				ctx["error"] = invalidCredentials
+				break
+			}
+			s.loginUser(w, r, u)
+			return
 		}
-		ctx["error"] = "invalid username or password"
 	}
 	s.render(w, r, "login.html", ctx)
+}
+
+func (s *Server) register(w http.ResponseWriter, r *http.Request) {
+	ctx := pongo2.Context{
+		"title": "Register",
+	}
+	if r.Method == http.MethodPost {
+		for {
+			var (
+				username  = r.Form.Get("username")
+				password  = r.Form.Get("password")
+				password2 = r.Form.Get("password2")
+				email     = r.Form.Get("email")
+				u         = &db.User{
+					Username: username,
+					Email:    email,
+				}
+			)
+			ctx["username"] = username
+			ctx["email"] = email
+			if len(username) == 0 || len(password) == 0 || len(email) == 0 {
+				ctx["error"] = "invalid input"
+				break
+			}
+			if password != password2 {
+				ctx["error"] = "passwords do not match"
+				break
+			}
+			if err := u.SetPassword(password); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if err := s.database.C.Create(u).Error; err != nil {
+				ctx["error"] = "unable to create user"
+				break
+			}
+			s.loginUser(w, r, u)
+			return
+		}
+	}
+	s.render(w, r, "register.html", ctx)
 }
 
 func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
