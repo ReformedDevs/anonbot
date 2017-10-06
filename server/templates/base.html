@@ -27,15 +27,18 @@
                         Suggestions
                     </a>
                     <div class="right menu">
-                        <a href="/login" class="item">
-                            Login
-                        </a>
-                        <a href="/register" class="item">
-                            Register
-                        </a>
-                        <a href="/logout" class="item">
-                            Logout
-                        </a>
+                        {% if user %}
+                            <a href="/logout" class="item">
+                                Logout
+                            </a>
+                        {% else %}
+                            <a href="/login" class="item">
+                                Login
+                            </a>
+                            <a href="/register" class="item">
+                                Register
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
