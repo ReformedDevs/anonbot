@@ -48,6 +48,8 @@ func New(cfg *Config) (*Server, error) {
 	s.router.HandleFunc("/login", s.login)
 	s.router.HandleFunc("/register", s.register)
 	s.router.HandleFunc("/logout", s.requireLogin(s.logout))
+	s.router.HandleFunc("/suggestions", s.requireLogin(s.suggestions))
+	s.router.HandleFunc("/suggestions/new", s.requireLogin(s.newSuggestion))
 	s.router.HandleFunc("/accounts", s.requireAdmin(s.accounts))
 	s.router.HandleFunc("/accounts/new", s.requireAdmin(s.newAccount))
 	s.router.HandleFunc("/accounts/delete", s.requireAdmin(s.deleteAccount))
