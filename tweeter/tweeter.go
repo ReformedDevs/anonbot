@@ -26,13 +26,16 @@ func (t *Tweeter) run() {
 		err := t.database.Transaction(func(c *db.Connection) error {
 			a, q := t.selectQueuedItem(c)
 			if a != nil && q != nil {
-				return t.tweet(c, a, q)
+				if err := t.tweet(c, a, q); err != nil {
+					return err
+				}
 			}
 			nextTweetCh = t.nextTweetCh(c)
 			return nil
 		})
 		if err != nil {
 			t.log.Error(err.Error())
+			nextTweetCh = time.After(30 * time.Second)
 		}
 		select {
 		case <-nextTweetCh:
