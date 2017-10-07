@@ -22,7 +22,9 @@
                         <td>{{ a.TweetInterval }}</td>
                         <td>
                             {% if a.LastTweet %}
-                                {{ a.LastTweetDate() }}
+                                <span data-tooltip="{{ a.LastTweetDate() }}">
+                                    {{ a.LastTweetDate()|timesince }}
+                                </span>
                             {% else %}
                                 &mdash;
                             {% endif %}

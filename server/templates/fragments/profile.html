@@ -5,7 +5,9 @@
             <div class="ui sub header">
                 {{ u.Username }}
             </div>
-            {{ date|date:"January 2, 2006 15:04:05 MST" }}
+            <span data-tooltip="{{ date }}" data-variation="mini">
+                {{ date|timesince }}
+            </span>
         </div>
     </div>
 </div>

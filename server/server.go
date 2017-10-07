@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
+
+	_ "github.com/flosch/pongo2-addons"
 )
 
 // Server provides the web UI for interacting with the application. Users can
