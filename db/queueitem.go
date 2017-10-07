@@ -1,10 +1,15 @@
 package db
 
+import (
+	"time"
+)
+
 // QueueItem represents a suggestion that has been approved and is queued for
 // tweeting.
 type QueueItem struct {
 	ID        int64
-	Order     int
+	Order     int64
+	Date      time.Time
 	Text      string   `gorm:"not null"`
 	User      *User    `gorm:"ForeignKey:UserID"`
 	UserID    int64    `sql:"type:int REFERENCES users(id) ON DELETE CASCADE"`
