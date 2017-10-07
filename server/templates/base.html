@@ -19,7 +19,7 @@
     <body>
         {% block navbar %}
             <div class="ui container navbar">
-                <div class="ui top fixed inverted menu">
+                <div class="ui top fixed inverted large menu">
                     <div class="ui container">
                         <a href="/" class="item">
                             Home
@@ -60,6 +60,17 @@
         {% endblock %}
 
         {% block content %}{% endblock %}
+
+        {% block footer %}
+            <div class="ui inverted vertical footer segment">
+                <div class="ui right aligned container">
+                    Copyright 2017 &mdash;
+                    <a href="https://quickmediasolutions.com">
+                        Nathan Osman
+                    </a>
+                </div>
+            </div>
+        {% endblock %}
 
         <script src="/static/js/jquery.min.js"></script>
         <script src="/static/js/semantic.min.js"></script>

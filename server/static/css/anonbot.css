@@ -2,9 +2,25 @@
  * Custom CSS Rules
  */
 
-body { padding-top: 60px; }
+body {
+    height: auto;
+    min-height: 100%;
+    padding-bottom: 144px;
+    padding-top: 72px;
+    position: relative;
+}
+
+.footer {
+    bottom: 0;
+    margin-top: 40px !important;
+    padding: 40px 0 !important;
+    position: absolute !important;
+    width: 100%;
+}
 
 /* Enforce a smaller max width */
 @media only screen and (min-width: 992px) {
-    .ui.container { width: 933px !important; }
+    .ui.container {
+        width: 933px !important;
+    }
 }
