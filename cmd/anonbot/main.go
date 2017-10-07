@@ -10,6 +10,7 @@ import (
 	"github.com/ReformedDevs/anonbot/server"
 	"github.com/ReformedDevs/anonbot/tweeter"
 	"github.com/howeyc/gopass"
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
@@ -30,6 +31,11 @@ func main() {
 			EnvVar: "DB_DRIVER",
 			Usage:  "database driver",
 		},
+		cli.BoolFlag{
+			Name:   "debug",
+			EnvVar: "DEBUG",
+			Usage:  "enable debug logging",
+		},
 		cli.StringFlag{
 			Name:   "secret-key",
 			EnvVar: "SECRET_KEY",
@@ -41,6 +47,12 @@ func main() {
 			EnvVar: "SERVER_ADDR",
 			Usage:  "server driver",
 		},
+	}
+	app.Before = func(c *cli.Context) error {
+		if c.Bool("debug") {
+			logrus.SetLevel(logrus.DebugLevel)
+		}
+		return nil
 	}
 	app.Commands = []cli.Command{
 		{
