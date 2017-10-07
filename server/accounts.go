@@ -2,10 +2,10 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/ReformedDevs/anonbot/db"
 	"github.com/flosch/pongo2"
+	"github.com/gorilla/mux"
 )
 
 func (s *Server) accounts(w http.ResponseWriter, r *http.Request) {
@@ -20,56 +20,77 @@ func (s *Server) accounts(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Server) newAccount(w http.ResponseWriter, r *http.Request) {
-	ctx := pongo2.Context{
-		"title": "New Account",
-	}
-	if r.Method == http.MethodPost {
-		for {
-			var (
-				name                = r.Form.Get("name")
-				consumerKey         = r.Form.Get("consumer_key")
-				consumerSecret      = r.Form.Get("consumer_secret")
-				accessToken         = r.Form.Get("access_token")
-				accessSecret        = r.Form.Get("access_secret")
-				tweetInterval       = r.Form.Get("tweet_interval")
-				tweetIntervalInt, _ = strconv.ParseInt(tweetInterval, 10, 64)
-				a                   = &db.Account{
-					Name:           name,
-					ConsumerKey:    consumerKey,
-					ConsumerSecret: consumerSecret,
-					AccessToken:    accessToken,
-					AccessSecret:   accessSecret,
-					TweetInterval:  tweetIntervalInt,
-				}
-			)
-			ctx["name"] = name
-			ctx["consumer_key"] = consumerKey
-			ctx["consumer_secret"] = consumerSecret
-			ctx["access_token"] = accessToken
-			ctx["access_secret"] = accessSecret
-			ctx["tweet_interval"] = tweetInterval
-			if len(name) == 0 {
-				ctx["error"] = "invalid name"
-				break
+type editAccountForm struct {
+	Name           string
+	ConsumerKey    string
+	ConsumerSecret string
+	AccessToken    string
+	AccessSecret   string
+	TweetInterval  int64
+}
+
+func (s *Server) editAccount(w http.ResponseWriter, r *http.Request) {
+	s.database.Transaction(func(c *db.Connection) error {
+		var (
+			id   = mux.Vars(r)["id"]
+			a    = &db.Account{}
+			form = &editAccountForm{
+				TweetInterval: 86400,
 			}
-			if err := s.database.C.Create(a).Error; err != nil {
-				ctx["error"] = "unable to create account"
-				break
+			ctx = pongo2.Context{
+				"form": form,
 			}
-			http.Redirect(w, r, "/accounts", http.StatusFound)
-			return
+		)
+		if len(id) != 0 {
+			if err := c.C.Find(a, id).Error; err != nil {
+				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+				return nil
+			}
+			s.copyStruct(a, form)
+			ctx["title"] = "Edit Account"
+			ctx["action"] = "Save"
+		} else {
+			ctx["title"] = "New Account"
+			ctx["action"] = "Create"
 		}
-	}
-	s.render(w, r, "newaccount.html", ctx)
+		if r.Method == http.MethodPost {
+			s.populateStruct(r.Form, form)
+			s.copyStruct(form, a)
+			if err := c.C.Save(a).Error; err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return nil
+			}
+			s.tweeter.Trigger()
+			http.Redirect(w, r, "/accounts", http.StatusFound)
+			return nil
+		}
+		s.render(w, r, "editaccount.html", ctx)
+		return nil
+	})
 }
 
 func (s *Server) deleteAccount(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		if err := s.database.C.Where("id = ?", r.Form.Get("id")).Delete(&db.Account{}).Error; err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+	s.database.Transaction(func(c *db.Connection) error {
+		var (
+			id = mux.Vars(r)["id"]
+			a  = &db.Account{}
+		)
+		if err := c.C.Find(a, id).Error; err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return nil
 		}
-	}
-	http.Redirect(w, r, "/accounts", http.StatusFound)
+		if r.Method == http.MethodPost {
+			if err := c.C.Delete(a).Error; err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return nil
+			}
+			http.Redirect(w, r, "/accounts", http.StatusFound)
+			return nil
+		}
+		s.render(w, r, "delete.html", pongo2.Context{
+			"title": "Delete Account",
+			"name":  a.Name,
+		})
+		return nil
+	})
 }

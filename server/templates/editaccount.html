@@ -2,8 +2,8 @@
 
 {% block content %}
     <div class="ui container">
-        <h2>New Account</h2>
-        <p>Use the form below to create a new account:</p>
+        <h2>{{ title }}</h2>
+        <p>Use the form below to create or edit an account:</p>
         {% if error %}
             <div class="ui negative message">
                 Error: {{ error }}
@@ -13,40 +13,40 @@
             <div class="field">
                 <div class="ui left icon input">
                     <i class="tag icon"></i>
-                    <input type="text" placeholder="Name" name="name" value="{{ name }}">
+                    <input type="text" placeholder="Name" name="Name" value="{{ form.Name }}">
                 </div>
             </div>
             <div class="field">
                 <div class="ui left icon input">
                     <i class="privacy icon"></i>
-                    <input type="text" placeholder="Consumer key" name="consumer_key" value="{{ consumer_key }}">
+                    <input type="text" placeholder="Consumer key" name="ConsumerKey" value="{{ form.ConsumerKey }}">
                 </div>
             </div>
             <div class="field">
                 <div class="ui left icon input">
                     <i class="privacy icon"></i>
-                    <input type="text" placeholder="Consumer secret" name="consumer_secret" value="{{ consumer_secret }}">
+                    <input type="text" placeholder="Consumer secret" name="ConsumerSecret" value="{{ form.ConsumerSecret }}">
                 </div>
             </div>
             <div class="field">
                 <div class="ui left icon input">
                     <i class="privacy icon"></i>
-                    <input type="text" placeholder="Access token" name="access_token" value="{{ access_token }}">
+                    <input type="text" placeholder="Access token" name="AccessToken" value="{{ form.AccessToken }}">
                 </div>
             </div>
             <div class="field">
                 <div class="ui left icon input">
                     <i class="privacy icon"></i>
-                    <input type="text" placeholder="Access secret" name="access_secret" value="{{ access_secret }}">
+                    <input type="text" placeholder="Access secret" name="AccessSecret" value="{{ form.AccessSecret }}">
                 </div>
             </div>
             <div class="field">
                 <div class="ui left icon input">
                     <i class="alarm icon"></i>
-                    <input type="text" placeholder="Tweet interval (in seconds)" name="tweet_interval" value="{{ tweet_interval }}">
+                    <input type="text" placeholder="Tweet interval (in seconds)" name="TweetInterval" value="{{ form.TweetInterval }}">
                 </div>
             </div>
-            <button type="submit" class="ui primary button">Create</button>
+            <button type="submit" class="ui primary button">{{ action }}</button>
         </form>
     </div>
 {% endblock %}

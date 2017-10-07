@@ -28,12 +28,12 @@
                             {% endif %}
                         </td>
                         <td class="collapsing">
-                            <form action="/accounts/delete" method="post">
-                                <input type="hidden" name="id" value="{{ a.ID }}">
-                                <button type="submit" class="ui negative mini button">
-                                    Delete
-                                </button>
-                            </form>
+                            <a href="/accounts/{{ a.ID }}/edit" class="ui mini button">
+                                Edit
+                            </a>
+                            <a href="/accounts/{{ a.ID }}/delete" class="ui negative mini button">
+                                Delete
+                            </a>
                         </td>
                     </tr>
                 {% empty %}
