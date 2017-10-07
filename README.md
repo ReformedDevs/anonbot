@@ -1,5 +1,6 @@
 ## anonbot
 
+[![Build Status](https://ci.quickmediasolutions.com/buildStatus/icon?job=anonbot)](https://ci.quickmediasolutions.com/job/anonbot)
 [![GoDoc](https://godoc.org/github.com/ReformedDevs/anonbot?status.svg)](https://godoc.org/github.com/ReformedDevs/anonbot)
 [![MIT License](http://img.shields.io/badge/license-MIT-9370d8.svg?style=flat)](http://opensource.org/licenses/MIT)
 
