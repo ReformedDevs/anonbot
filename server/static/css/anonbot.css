@@ -3,3 +3,8 @@
  */
 
 body { padding-top: 60px; }
+
+/* Enforce a smaller max width */
+@media only screen and (min-width: 992px) {
+    .ui.container { width: 933px !important; }
+}
