@@ -23,6 +23,6 @@ The makefile uses the `golang:latest` container to compile the application, so t
 
 Once built, the application can easily be run in a Docker container. Simply open a terminal and run:
 
-    docker build -t ReformedDevs/anonbot .
+    docker build -t reformeddevs/anonbot .
 
 [TODO: describe container env. variables]
