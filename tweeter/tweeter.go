@@ -26,8 +26,9 @@ func (t *Tweeter) run() {
 		err := t.database.Transaction(func(c *db.Connection) error {
 			a, q := t.selectQueuedItem(c)
 			if a != nil && q != nil {
-				return t.tweet(a, q)
+				return t.tweet(c, a, q)
 			}
+			nextTweetCh = t.nextTweetCh(c)
 			return nil
 		})
 		if err != nil {

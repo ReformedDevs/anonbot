@@ -9,14 +9,14 @@ import (
 
 func (t *Tweeter) selectQueuedItem(c *db.Connection) (*db.Account, *db.QueueItem) {
 	a := &db.Account{}
-	if err := t.database.C.
+	if err := c.C.
 		Where("queue_length > 0").
 		Where("last_tweet + tweet_interval <= ?", time.Now().Unix()).
 		First(a).Error; err != nil {
 		return nil, nil
 	}
 	q := &db.QueueItem{}
-	if err := t.database.C.
+	if err := c.C.
 		Order("order").
 		Where("account_id = ?", a.ID).
 		First(q).Error; err != nil {
@@ -25,7 +25,8 @@ func (t *Tweeter) selectQueuedItem(c *db.Connection) (*db.Account, *db.QueueItem
 	return a, q
 }
 
-func (t *Tweeter) tweet(a *db.Account, q *db.QueueItem) error {
+func (t *Tweeter) tweet(c *db.Connection, a *db.Account, q *db.QueueItem) error {
+	t.log.Infof("tweeting for %s...", a.Name)
 	anaconda.SetConsumerKey(a.ConsumerKey)
 	anaconda.SetConsumerSecret(a.ConsumerSecret)
 	api := anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret)
@@ -33,13 +34,25 @@ func (t *Tweeter) tweet(a *db.Account, q *db.QueueItem) error {
 	if err != nil {
 		return err
 	}
-	if err := t.database.C.Delete(q).Error; err != nil {
+	if err := c.C.Delete(q).Error; err != nil {
 		return err
 	}
 	a.QueueLength--
 	a.LastTweet = time.Now().Unix()
-	if err := t.database.C.Save(a).Error; err != nil {
+	if err := c.C.Save(a).Error; err != nil {
 		return err
 	}
 	return nil
+}
+
+func (t *Tweeter) nextTweetCh(c *db.Connection) <-chan time.Time {
+	a := &db.Account{}
+	if err := c.C.
+		Select("last_tweet + tweet_interval AS next_tweet_time").
+		Order("next_tweet_time").
+		Where("queue_length > 0").
+		First(a).Error; err != nil {
+		return nil
+	}
+	return time.After(time.Unix(a.LastTweet+a.TweetInterval, 0).Sub(time.Now()))
 }
