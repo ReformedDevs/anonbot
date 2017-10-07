@@ -12,6 +12,7 @@ type Account struct {
 	ConsumerSecret string `gorm:"not null"`
 	AccessToken    string `gorm:"not null"`
 	AccessSecret   string `gorm:"not null"`
+	QueueLength    int64
 	TweetInterval  int64
 	LastTweet      time.Time
 }

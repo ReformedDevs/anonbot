@@ -8,6 +8,7 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Queue Length</th>
                     <th>Interval</th>
                     <th>Last Tweet</th>
                     <th class="right aligned">Actions</th>
@@ -17,6 +18,7 @@
                 {% for a in accounts %}
                     <tr>
                         <td>{{ a.Name }}</td>
+                        <td>{{ a.QueueLength }}</td>
                         <td>{{ a.TweetInterval }}</td>
                         <td>
                             {% if a.LastTweet|integer %}
@@ -36,7 +38,7 @@
                     </tr>
                 {% empty %}
                     <tr class="disabled">
-                        <td colspan="4">
+                        <td colspan="5">
                             No accounts
                         </td>
                     </tr>
@@ -44,7 +46,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="4">
+                    <th colspan="5">
                         <a href="/accounts/new" class="ui primary mini button">
                             New
                         </a>

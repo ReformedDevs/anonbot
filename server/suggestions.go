@@ -72,7 +72,7 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 				"suggestion": su,
 			}
 		)
-		if err := c.C.Find(su, id).Error; err != nil {
+		if err := c.C.Preload("Account").Find(su, id).Error; err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return nil
 		}
@@ -90,6 +90,11 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 					AccountID: su.AccountID,
 				}
 				if err := c.C.Save(q).Error; err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return nil
+				}
+				su.Account.QueueLength++
+				if err := c.C.Save(su.Account).Error; err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return nil
 				}
