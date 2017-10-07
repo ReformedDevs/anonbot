@@ -3,5 +3,41 @@
 {% block content %}
     <div class="ui container">
         <h2>Queue</h2>
+        <p>Queued tweets are shown below.</p>
+        <table class="ui table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Text</th>
+                    <th>Author</th>
+                    {% if user.IsAdmin %}
+                        <th class="right aligned">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in queue %}
+                    <tr>
+                        <td>{{ q.Account.Name }}</td>
+                        <td>{{ q.Text }}</td>
+                        <td class="collapsing">
+                            {% with u=q.User date=q.Date %}
+                                {% include "fragments/profile.html" %}
+                            {% endwith %}
+                        </td>
+                        {% if user.IsAdmin %}
+                            <td class="collapsing">
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% empty %}
+                    <tr class="disabled">
+                        <td colspan="{% if user.IsAdmin %}4{% else %}3{% endif %}">
+                            No queued items
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

@@ -9,7 +9,7 @@ import (
 
 func (s *Server) queue(w http.ResponseWriter, r *http.Request) {
 	queue := []*db.QueueItem{}
-	if err := s.database.C.Find(&queue).Error; err != nil {
+	if err := s.database.C.Preload("User").Preload("Account").Order("account_id").Find(&queue).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
