@@ -16,16 +16,23 @@ Assuming you have Docker and GNU Make installed, building the entire application
 
     make
 
-The makefile uses the `golang:latest` container to compile the application, so there is no need to have the Go toolchain installed locally. Once compilation is complete, you can run the application and view usage instructions with:
+The makefile uses the `golang:latest` container to compile the application, so there is no need to have the Go toolchain installed locally. Once compilation is complete, you can run the application with:
 
-    dist/anonbot --help
+    dist/anonbot
 
-The application currently requires a PostgreSQL database.
+### Usage
+
+anonbot requires an SQL database (currently limited to PostgreSQL) which must be initialized before first use. Assuming you have PostgreSQL running locally, the command would look like this:
+
+    dist/anonbot \
+        --db-driver postgres \
+        --db-args 'dbname=postgres user=postgres' \
+        migrate
+
+Once the migration completes, you can run the command above without "migration" to launch the web server. By default, the application is accessible on port 8000.
 
 ### Using with Docker
 
-Once built, the application can easily be run in a Docker container. Simply open a terminal and run:
+The application can easily be run in a Docker container. To build the container, simply open a terminal and run:
 
     docker build -t reformeddevs/anonbot .
-
-[TODO: describe container env. variables]
