@@ -19,37 +19,39 @@
     <body>
         {% block navbar %}
             <div class="ui container navbar">
-                <div class="ui secondary pointing menu">
-                    <a href="/" class="item">
-                        Home
-                    </a>
-                    <a href="/suggestions" class="item">
-                        Suggestions
-                    </a>
-                    <a href="/queue" class="item">
-                        Queue
-                    </a>
-                    {% if user.IsAdmin %}
-                        <a href="/accounts" class="item">
-                            Accounts
+                <div class="ui top fixed inverted menu">
+                    <div class="ui container">
+                        <a href="/" class="item">
+                            Home
                         </a>
-                        <a href="/users" class="item">
-                            Users
+                        <a href="/suggestions" class="item">
+                            Suggestions
                         </a>
-                    {% endif %}
-                    <div class="right menu">
-                        {% if user %}
-                            <a href="/logout" class="item">
-                                Logout
+                        <a href="/queue" class="item">
+                            Queue
+                        </a>
+                        {% if user.IsAdmin %}
+                            <a href="/accounts" class="item">
+                                Accounts
                             </a>
-                        {% else %}
-                            <a href="/login" class="item">
-                                Login
-                            </a>
-                            <a href="/register" class="item">
-                                Register
+                            <a href="/users" class="item">
+                                Users
                             </a>
                         {% endif %}
+                        <div class="right menu">
+                            {% if user %}
+                                <a href="/logout" class="item">
+                                    Logout
+                                </a>
+                            {% else %}
+                                <a href="/login" class="item">
+                                    Login
+                                </a>
+                                <a href="/register" class="item">
+                                    Register
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
