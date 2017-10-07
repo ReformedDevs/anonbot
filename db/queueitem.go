@@ -8,7 +8,6 @@ import (
 // tweeting.
 type QueueItem struct {
 	ID        int64
-	Order     int64
 	Date      time.Time
 	Text      string   `gorm:"not null"`
 	User      *User    `gorm:"ForeignKey:UserID"`

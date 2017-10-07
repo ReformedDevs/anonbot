@@ -84,8 +84,7 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 					return nil
 				}
 				q := &db.QueueItem{
-					Order:     0,
-					Date:      su.Date,
+					Date:      time.Now(),
 					Text:      r.Form.Get("text"),
 					UserID:    su.UserID,
 					AccountID: su.AccountID,

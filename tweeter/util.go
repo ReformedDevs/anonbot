@@ -17,7 +17,7 @@ func (t *Tweeter) selectQueuedItem(c *db.Connection) (*db.Account, *db.QueueItem
 	}
 	q := &db.QueueItem{}
 	if err := c.C.
-		Order("order").
+		Order("date").
 		Where("account_id = ?", a.ID).
 		First(q).Error; err != nil {
 		return nil, nil
