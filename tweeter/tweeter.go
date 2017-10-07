@@ -1,6 +1,8 @@
 package tweeter
 
 import (
+	"time"
+
 	"github.com/ReformedDevs/anonbot/db"
 	"github.com/sirupsen/logrus"
 )
@@ -18,7 +20,21 @@ func (t *Tweeter) run() {
 	defer t.log.Info("tweeter has stopped")
 	t.log.Info("starting tweeter...")
 	for {
+		var (
+			nextTweetCh <-chan time.Time
+		)
+		err := t.database.Transaction(func(c *db.Connection) error {
+			a, q := t.selectQueuedItem(c)
+			if a != nil && q != nil {
+				return t.tweet(a, q)
+			}
+			return nil
+		})
+		if err != nil {
+			t.log.Error(err.Error())
+		}
 		select {
+		case <-nextTweetCh:
 		case _, ok := <-t.triggerCh:
 			if !ok {
 				return

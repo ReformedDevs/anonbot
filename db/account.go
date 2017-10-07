@@ -14,5 +14,10 @@ type Account struct {
 	AccessSecret   string `gorm:"not null"`
 	QueueLength    int64
 	TweetInterval  int64
-	LastTweet      time.Time
+	LastTweet      int64
+}
+
+// LastTweetDate returns the time of the last tweet as a time.Time.
+func (a *Account) LastTweetDate() time.Time {
+	return time.Unix(a.LastTweet, 0)
 }

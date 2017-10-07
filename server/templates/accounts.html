@@ -21,8 +21,8 @@
                         <td>{{ a.QueueLength }}</td>
                         <td>{{ a.TweetInterval }}</td>
                         <td>
-                            {% if a.LastTweet|integer %}
-                                {{ a.LastTweet }}
+                            {% if a.LastTweet %}
+                                {{ a.LastTweetDate() }}
                             {% else %}
                                 &mdash;
                             {% endif %}
