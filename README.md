@@ -19,6 +19,8 @@ The makefile uses the `golang:latest` container to compile the application, so t
 
     dist/anonbot --help
 
+The application currently requires a PostgreSQL database.
+
 ### Using with Docker
 
 Once built, the application can easily be run in a Docker container. Simply open a terminal and run:
