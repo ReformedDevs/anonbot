@@ -40,6 +40,8 @@ func (s *Server) populateStruct(form url.Values, v interface{}) {
 		case reflect.Int64:
 			iVal, _ := strconv.ParseInt(s, 10, 64)
 			fVal.SetInt(iVal)
+		case reflect.Bool:
+			fVal.SetBool(len(s) > 0)
 		}
 	}
 }

@@ -11,8 +11,20 @@
         {% endif %}
         <form class="ui form" method="post">
             <div class="field">
+                <div class="ui left icon input">
+                    <i class="user icon"></i>
+                    <input type="text" placeholder="Username" name="Username" value="{{ form.Username }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="mail icon"></i>
+                    <input type="text" placeholder="Email" name="Email" value="{{ form.Email }}">
+                </div>
+            </div>
+            <div class="field">
                 <div class="ui slider checkbox">
-                    <input type="checkbox" name="is_admin"{% if is_admin %} checked="checked"{% endif%}>
+                    <input type="checkbox" name="IsAdmin"{% if form.IsAdmin %} checked="checked"{% endif%}>
                     <label>Is admin</label>
                 </div>
               </div>
