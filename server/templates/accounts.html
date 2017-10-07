@@ -8,6 +8,8 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Interval</th>
+                    <th>Last Tweet</th>
                     <th class="right aligned">Actions</th>
                 </tr>
             </thead>
@@ -15,6 +17,14 @@
                 {% for a in accounts %}
                     <tr>
                         <td>{{ a.Name }}</td>
+                        <td>{{ a.TweetInterval }}</td>
+                        <td>
+                            {% if a.LastTweet|integer %}
+                                {{ a.LastTweet }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
                         <td class="collapsing">
                             <form action="/accounts/delete" method="post">
                                 <input type="hidden" name="id" value="{{ a.ID }}">
@@ -26,7 +36,7 @@
                     </tr>
                 {% empty %}
                     <tr class="disabled">
-                        <td colspan="2">
+                        <td colspan="4">
                             No accounts
                         </td>
                     </tr>
@@ -34,7 +44,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="2">
+                    <th colspan="4">
                         <a href="/accounts/new" class="ui primary mini button">
                             New
                         </a>
