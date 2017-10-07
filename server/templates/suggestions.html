@@ -21,17 +21,9 @@
                         <td>{{ s.Account.Name }}</td>
                         <td>{{ s.Text }}</td>
                         <td class="collapsing">
-                            <div class="ui mini horizontal list">
-                                <div class="item">
-                                    <img class="ui avatar image" src="//gravatar.com/avatar/{{ s.User.Email|md5 }}?s=32&d=identicon">
-                                    <div class="content">
-                                        <div class="ui sub header">
-                                            {{ s.User.Username }}
-                                        </div>
-                                        {{ s.Date }}
-                                    </div>
-                                </div>
-                            </div>
+                            {% with u=s.User date=s.Date %}
+                                {% include "fragments/profile.html" %}
+                            {% endwith %}
                         </td>
                         {% if user.IsAdmin %}
                             <td class="collapsing">
