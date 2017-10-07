@@ -7,6 +7,7 @@ import (
 
 	"github.com/ReformedDevs/anonbot/db"
 	"github.com/flosch/pongo2"
+	"github.com/gorilla/mux"
 )
 
 func (s *Server) suggestions(w http.ResponseWriter, r *http.Request) {
@@ -59,4 +60,44 @@ func (s *Server) newSuggestion(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	s.render(w, r, "newsuggestion.html", ctx)
+}
+
+func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
+	s.database.Transaction(func(c *db.Connection) error {
+		var (
+			id  = mux.Vars(r)["id"]
+			su  = &db.Suggestion{}
+			ctx = pongo2.Context{
+				"title":      "Queue Suggestion",
+				"suggestion": su,
+			}
+		)
+		if err := c.C.Find(su, id).Error; err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return nil
+		}
+		ctx["text"] = su.Text
+		if r.Method == http.MethodPost {
+			for {
+				if err := c.C.Delete(su).Error; err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return nil
+				}
+				q := &db.QueueItem{
+					Order:     0,
+					Text:      r.Form.Get("text"),
+					UserID:    su.UserID,
+					AccountID: su.AccountID,
+				}
+				if err := c.C.Save(q).Error; err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return nil
+				}
+				http.Redirect(w, r, "/suggestions", http.StatusTemporaryRedirect)
+				return nil
+			}
+		}
+		s.render(w, r, "queuesuggestion.html", ctx)
+		return nil
+	})
 }

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>Queue Suggestion</h2>
+        <p>Use the form below to edit the tweet before queueing it.</p>
+        {% if error %}
+            <div class="ui error message">
+                Error: {{ error }}
+            </div>
+        {% endif %}
+        <form class="ui form" method="post">
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="comment icon"></i>
+                    <input type="text" placeholder="Text" name="text" value="{{ text }}">
+                </div>
+            </div>
+            <button type="submit" class="ui fluid large primary button">Queue</button>
+        </form>
+    </div>
+{% endblock %}

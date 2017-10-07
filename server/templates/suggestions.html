@@ -35,12 +35,9 @@
                         </td>
                         {% if user.IsAdmin %}
                             <td class="collapsing">
-                                <form action="/suggestions/queue" method="post">
-                                    <input type="hidden" name="id" value="{{ s.ID }}">
-                                    <button type="submit" class="ui primary mini button">
-                                        Queue
-                                    </button>
-                                </form>
+                                <a href="/suggestions/{{ s.ID }}/queue" class="ui primary mini button">
+                                    Queue
+                                </a>
                             </td>
                         {% endif %}
                     </tr>

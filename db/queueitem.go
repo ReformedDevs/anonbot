@@ -3,8 +3,11 @@ package db
 // QueueItem represents a suggestion that has been approved and is queued for
 // tweeting.
 type QueueItem struct {
-	ID           int64
-	Order        int
-	Suggestion   *Suggestion `gorm:"ForeignKey:SuggestionID"`
-	SuggestionID int64       `sql:"type:int REFERENCES suggestions(id) ON DELETE CASCADE"`
+	ID        int64
+	Order     int
+	Text      string   `gorm:"not null"`
+	User      *User    `gorm:"ForeignKey:UserID"`
+	UserID    int64    `sql:"type:int REFERENCES users(id) ON DELETE CASCADE"`
+	Account   *Account `gorm:"ForeignKey:AccountID"`
+	AccountID int64    `sql:"type:int REFERENCES accounts(id) ON DELETE CASCADE"`
 }
