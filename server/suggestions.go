@@ -99,6 +99,7 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return nil
 				}
+				s.tweeter.Trigger()
 				http.Redirect(w, r, "/suggestions", http.StatusFound)
 				return nil
 			}

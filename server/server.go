@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ReformedDevs/anonbot/db"
+	"github.com/ReformedDevs/anonbot/tweeter"
 	"github.com/flosch/pongo2"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -17,6 +18,7 @@ import (
 type Server struct {
 	listener    net.Listener
 	database    *db.Connection
+	tweeter     *tweeter.Tweeter
 	router      *mux.Router
 	store       *sessions.CookieStore
 	templateSet *pongo2.TemplateSet
@@ -34,6 +36,7 @@ func New(cfg *Config) (*Server, error) {
 		s = &Server{
 			listener:    l,
 			database:    cfg.Database,
+			tweeter:     cfg.Tweeter,
 			router:      mux.NewRouter(),
 			store:       sessions.NewCookieStore([]byte(cfg.SecretKey)),
 			templateSet: pongo2.NewSet("", &b0xLoader{}),
