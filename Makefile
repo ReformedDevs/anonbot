@@ -18,6 +18,8 @@ dist/${CMD}: ${SOURCES} server/ab0x.go | cache/lib cache/src/${PKG} dist
 	@docker run \
 	    --rm \
 	    -e CGO_ENABLED=0 \
+	    -e GIT_COMMITTER_NAME=a \
+	    -e GIT_COMMITTER_EMAIL=b \
 	    -u ${UID}:${GID} \
 	    -v ${CWD}/cache/lib:/go/lib \
 	    -v ${CWD}/cache/src:/go/src \
@@ -35,6 +37,8 @@ dist/fileb0x: | cache/lib cache/src/${PKG} dist
 	@docker run \
 	    --rm \
 	    -e CGO_ENABLED=0 \
+	    -e GIT_COMMITTER_NAME=a \
+	    -e GIT_COMMITTER_EMAIL=b \
 	    -u ${UID}:${GID} \
 	    -v ${CWD}/cache/lib:/go/lib \
 	    -v ${CWD}/cache/src:/go/src \
