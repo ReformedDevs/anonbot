@@ -57,7 +57,7 @@ func (s *Server) newAccount(w http.ResponseWriter, r *http.Request) {
 				ctx["error"] = "unable to create account"
 				break
 			}
-			http.Redirect(w, r, "/accounts", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/accounts", http.StatusFound)
 			return
 		}
 	}
@@ -71,5 +71,5 @@ func (s *Server) deleteAccount(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	http.Redirect(w, r, "/accounts", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/accounts", http.StatusFound)
 }

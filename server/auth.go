@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"net/url"
 
 	"github.com/ReformedDevs/anonbot/db"
 	"github.com/flosch/pongo2"
@@ -32,7 +33,8 @@ func (s *Server) loadUser(r *http.Request) *http.Request {
 func (s *Server) requireLogin(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(contextUser) == nil {
-			http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+			u := url.QueryEscape(r.URL.RequestURI())
+			http.Redirect(w, r, "/login?url="+u, http.StatusFound)
 			return
 		}
 		fn(w, r)
@@ -53,7 +55,11 @@ func (s *Server) loginUser(w http.ResponseWriter, r *http.Request, u *db.User) {
 	session, _ := s.store.Get(r, sessionName)
 	session.Values[sessionUserID] = u.ID
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	redir := r.URL.Query().Get("url")
+	if len(redir) == 0 {
+		redir = "/"
+	}
+	http.Redirect(w, r, redir, http.StatusFound)
 }
 
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
@@ -129,5 +135,5 @@ func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
 	session, _ := s.store.Get(r, sessionName)
 	session.Values[sessionUserID] = ""
 	session.Save(r, w)
-	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "/", http.StatusFound)
 }

@@ -55,7 +55,7 @@ func (s *Server) newSuggestion(w http.ResponseWriter, r *http.Request) {
 				ctx["error"] = "unable to create suggestion"
 				break
 			}
-			http.Redirect(w, r, "/suggestions", http.StatusTemporaryRedirect)
+			http.Redirect(w, r, "/suggestions", http.StatusFound)
 			return
 		}
 	}
@@ -93,7 +93,7 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return nil
 				}
-				http.Redirect(w, r, "/suggestions", http.StatusTemporaryRedirect)
+				http.Redirect(w, r, "/suggestions", http.StatusFound)
 				return nil
 			}
 		}
