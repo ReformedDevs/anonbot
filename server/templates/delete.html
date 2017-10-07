@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>{{ title }}</h2>
+        <p>Are you sure you wish to delete {{ name }}?</p>
+        <form class="ui form" method="post">
+            <button type="submit" class="ui negative button">Confirm</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>Edit User</h2>
+        <p>Use the form below to edit the user:</p>
+        {% if error %}
+            <div class="ui negative message">
+                Error: {{ error }}
+            </div>
+        {% endif %}
+        <form class="ui form" method="post">
+            <div class="field">
+                <div class="ui slider checkbox">
+                    <input type="checkbox" name="is_admin"{% if is_admin %} checked="checked"{% endif%}>
+                    <label>Is admin</label>
+                </div>
+              </div>
+            <button type="submit" class="ui fluid large primary button">Save</button>
+        </form>
+    </div>
+{% endblock %}
