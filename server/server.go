@@ -58,6 +58,7 @@ func New(cfg *Config) (*Server, error) {
 	s.router.HandleFunc("/accounts", s.requireAdmin(s.accounts))
 	s.router.HandleFunc("/accounts/new", s.requireAdmin(s.newAccount))
 	s.router.HandleFunc("/accounts/delete", s.requireAdmin(s.deleteAccount))
+	s.router.HandleFunc("/users", s.requireAdmin(s.users))
 	s.router.PathPrefix("/static").Handler(http.FileServer(HTTP))
 	go func() {
 		defer close(s.stoppedCh)

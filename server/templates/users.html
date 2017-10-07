@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>Users</h2>
+        <p>Use the table below to manage users:</p>
+        <table class="ui table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Admin</th>
+                    <th class="right aligned">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                    <tr>
+                        <td>{{ u.Username }}</td>
+                        <td>
+                            <a href="mailto:{{ u.Email }}">{{ u.Email }}</a>
+                        </td>
+                        <td class="collapsing center aligned">
+                            {% if u.IsAdmin %}
+                                <i class="checkmark icon"></i>
+                            {% else %}
+                                <i class="remove icon"></i>
+                            {% endif %}
+                        </td>
+                        <td class="collapsing">
+                            <a href="/users/{{ u.id }}/edit" class="ui mini button">
+                                Edit
+                            </a>
+                            <a href="/users/{{ u.ID }}/delete" class="ui negative mini button">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
