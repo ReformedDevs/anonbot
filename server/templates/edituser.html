@@ -2,8 +2,8 @@
 
 {% block content %}
     <div class="ui container">
-        <h2>Edit User</h2>
-        <p>Use the form below to edit the user:</p>
+        <h2>{{ title }}</h2>
+        <p>Use the form below to create or edit a user:</p>
         {% if error %}
             <div class="ui negative message">
                 Error: {{ error }}
@@ -14,6 +14,18 @@
                 <div class="ui left icon input">
                     <i class="user icon"></i>
                     <input type="text" placeholder="Username" name="Username" value="{{ form.Username }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="lock icon"></i>
+                    <input type="password" placeholder="Password (blank to keep value)" name="password">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="lock icon"></i>
+                    <input type="password" placeholder="Confirm password" name="password2">
                 </div>
             </div>
             <div class="field">

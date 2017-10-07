@@ -10,7 +10,7 @@ import (
 
 func (s *Server) users(w http.ResponseWriter, r *http.Request) {
 	users := []*db.User{}
-	if err := s.database.C.Find(&users).Error; err != nil {
+	if err := s.database.C.Order("username").Find(&users).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -49,14 +49,30 @@ func (s *Server) editUser(w http.ResponseWriter, r *http.Request) {
 			ctx["action"] = "Create"
 		}
 		if r.Method == http.MethodPost {
-			s.populateStruct(r.Form, form)
-			s.copyStruct(form, u)
-			if err := c.C.Save(u).Error; err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+			for {
+				s.populateStruct(r.Form, form)
+				s.copyStruct(form, u)
+				var (
+					password  = r.Form.Get("password")
+					password2 = r.Form.Get("password2")
+				)
+				if len(password) > 0 {
+					if password != password2 {
+						ctx["error"] = "passwords do not match"
+						break
+					}
+					if err := u.SetPassword(password); err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return nil
+					}
+				}
+				if err := c.C.Save(u).Error; err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return nil
+				}
+				http.Redirect(w, r, "/users", http.StatusFound)
 				return nil
 			}
-			http.Redirect(w, r, "/users", http.StatusFound)
-			return nil
 		}
 		s.render(w, r, "edituser.html", ctx)
 		return nil
