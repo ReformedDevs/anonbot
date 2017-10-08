@@ -59,6 +59,7 @@ func New(cfg *Config) (*Server, error) {
 	s.router.HandleFunc("/suggestions/{id:[0-9]+}/queue", s.requireAdmin(s.queueSuggestion))
 	s.router.HandleFunc("/suggestions/{id:[0-9]+}/delete", s.requireLogin(s.deleteSuggestion))
 	s.router.HandleFunc("/queue", s.requireLogin(s.queue))
+	s.router.HandleFunc("/queue/{id:[0-9]+}/delete", s.requireAdmin(s.deleteQueueItem))
 	s.router.HandleFunc("/accounts", s.requireAdmin(s.accounts))
 	s.router.HandleFunc("/accounts/new", s.requireAdmin(s.editAccount))
 	s.router.HandleFunc("/accounts/{id:[0-9]+}/edit", s.requireAdmin(s.editAccount))

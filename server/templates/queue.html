@@ -12,7 +12,7 @@
                     <th class="center aligned">Media</th>
                     <th>Author</th>
                     {% if user.IsAdmin %}
-                        <th class="right aligned">Actions</th>
+                        <th>Actions</th>
                     {% endif %}
                 </tr>
             </thead>
@@ -35,7 +35,9 @@
                         </td>
                         {% if user.IsAdmin %}
                             <td class="collapsing">
-                                <!-- ... -->
+                                <a href="/queue/{{ q.ID }}/delete" class="ui negative mini button">
+                                    Delete
+                                </a>
                             </td>
                         {% endif %}
                     </tr>
