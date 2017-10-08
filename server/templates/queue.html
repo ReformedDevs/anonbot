@@ -9,6 +9,7 @@
                 <tr>
                     <th>Account</th>
                     <th>Text</th>
+                    <th class="center aligned">Media</th>
                     <th>Author</th>
                     {% if user.IsAdmin %}
                         <th class="right aligned">Actions</th>
@@ -20,19 +21,27 @@
                     <tr>
                         <td>{{ q.Account.Name }}</td>
                         <td>{{ q.Text }}</td>
-                        <td class="collapsing">
+                        <td class="center aligned">
+                            {% if s.MediaURL %}
+                                <a href="{{ s.MediaURL }}" target="_blank">
+                                    <i class="external icon"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
                             {% with u=q.User date=q.Date %}
                                 {% include "fragments/profile.html" %}
                             {% endwith %}
                         </td>
                         {% if user.IsAdmin %}
                             <td class="collapsing">
+                                <!-- ... -->
                             </td>
                         {% endif %}
                     </tr>
                 {% empty %}
                     <tr class="disabled">
-                        <td colspan="{% if user.IsAdmin %}4{% else %}3{% endif %}">
+                        <td colspan="{% if user.IsAdmin %}5{% else %}4{% endif %}">
                             No queued items
                         </td>
                     </tr>

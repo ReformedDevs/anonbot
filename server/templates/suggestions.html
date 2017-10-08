@@ -9,7 +9,7 @@
                 <tr>
                     <th>Account</th>
                     <th>Text</th>
-                    <th>Media</th>
+                    <th class="center aligned">Media</th>
                     <th>Author</th>
                     <th>Actions</th>
                 </tr>
@@ -19,14 +19,14 @@
                     <tr>
                         <td>{{ s.Account.Name }}</td>
                         <td>{{ s.Text }}</td>
-                        <td>
+                        <td class="center aligned">
                             {% if s.MediaURL %}
                                 <a href="{{ s.MediaURL }}" target="_blank">
                                     <i class="external icon"></i>
                                 </a>
                             {% endif %}
                         </td>
-                        <td class="collapsing">
+                        <td>
                             {% with u=s.User date=s.Date %}
                                 {% include "fragments/profile.html" %}
                             {% endwith %}
