@@ -9,10 +9,9 @@
                 <tr>
                     <th>Account</th>
                     <th>Text</th>
+                    <th>Media</th>
                     <th>Author</th>
-                    {% if user.IsAdmin %}
-                        <th class="right aligned">Actions</th>
-                    {% endif %}
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,28 +19,39 @@
                     <tr>
                         <td>{{ s.Account.Name }}</td>
                         <td>{{ s.Text }}</td>
+                        <td>
+                            {% if s.MediaURL %}
+                                <a href="{{ s.MediaURL }}" target="_blank">
+                                    <i class="external icon"></i>
+                                </a>
+                            {% endif %}
+                        </td>
                         <td class="collapsing">
                             {% with u=s.User date=s.Date %}
                                 {% include "fragments/profile.html" %}
                             {% endwith %}
                         </td>
-                        {% if user.IsAdmin %}
-                            <td class="collapsing">
+                        <td class="collapsing">
+                            {% if user.IsAdmin or s.UserID == user.ID %}
                                 <a href="/suggestions/{{ s.ID }}/edit" class="ui mini button">
                                     Edit
                                 </a>
+                            {% endif %}
+                            {% if user.IsAdmin %}
                                 <a href="/suggestions/{{ s.ID }}/queue" class="ui primary mini button">
                                     Queue
                                 </a>
+                            {% endif %}
+                            {% if user.IsAdmin or s.UserID == user.ID %}
                                 <a href="/suggestions/{{ s.ID }}/delete" class="ui negative mini button">
                                     Delete
                                 </a>
-                            </td>
-                        {% endif %}
+                            {% endif %}
+                        </td>
                     </tr>
                 {% empty %}
                     <tr class="disabled">
-                        <td colspan="{% if user.IsAdmin %}4{% else %}3{% endif %}">
+                        <td colspan="5">
                             No suggestions
                         </td>
                     </tr>
@@ -49,7 +59,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="{% if user.IsAdmin %}4{% else %}3{% endif %}">
+                    <th colspan="5">
                         <a href="/suggestions/new" class="ui primary mini button">
                             New
                         </a>
