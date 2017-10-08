@@ -35,7 +35,8 @@ func New(cfg *Config) (*Server, error) {
 		return nil, err
 	}
 	var (
-		s = &Server{
+		router = mux.NewRouter()
+		s      = &Server{
 			listener:    l,
 			database:    cfg.Database,
 			tweeter:     cfg.Tweeter,
@@ -46,7 +47,7 @@ func New(cfg *Config) (*Server, error) {
 			stoppedCh:   make(chan bool),
 		}
 		server = http.Server{
-			Handler: s,
+			Handler: router,
 		}
 	)
 	s.router.HandleFunc("/", s.index)
@@ -68,7 +69,8 @@ func New(cfg *Config) (*Server, error) {
 	s.router.HandleFunc("/users/new", s.requireAdmin(s.editUser))
 	s.router.HandleFunc("/users/{id:[0-9]+}/edit", s.requireAdmin(s.editUser))
 	s.router.HandleFunc("/users/{id:[0-9]+}/delete", s.requireAdmin(s.deleteUser))
-	s.router.PathPrefix("/static").Handler(http.FileServer(HTTP))
+	router.PathPrefix("/static").Handler(http.FileServer(HTTP))
+	router.PathPrefix("/").Handler(s)
 	go func() {
 		defer close(s.stoppedCh)
 		defer s.log.Info("web server has stopped")
