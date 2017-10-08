@@ -3,7 +3,6 @@ package tweeter
 import (
 	"time"
 
-	"github.com/ChimeraCoder/anaconda"
 	"github.com/ReformedDevs/anonbot/db"
 )
 
@@ -23,26 +22,6 @@ func (t *Tweeter) selectQueuedItem(c *db.Connection) (*db.Account, *db.QueueItem
 		return nil, nil
 	}
 	return a, q
-}
-
-func (t *Tweeter) tweet(c *db.Connection, a *db.Account, q *db.QueueItem) error {
-	t.log.Infof("tweeting from %s...", a.Name)
-	anaconda.SetConsumerKey(a.ConsumerKey)
-	anaconda.SetConsumerSecret(a.ConsumerSecret)
-	api := anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret)
-	_, err := api.PostTweet(q.Text, nil)
-	if err != nil {
-		return err
-	}
-	if err := c.C.Delete(q).Error; err != nil {
-		return err
-	}
-	a.QueueLength--
-	a.LastTweet = time.Now().Unix()
-	if err := c.C.Save(a).Error; err != nil {
-		return err
-	}
-	return nil
 }
 
 func (t *Tweeter) nextTweetCh(c *db.Connection) <-chan time.Time {
