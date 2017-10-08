@@ -30,12 +30,17 @@ func (s *Server) deleteQueueItem(w http.ResponseWriter, r *http.Request) {
 			id = mux.Vars(r)["id"]
 			q  = &db.QueueItem{}
 		)
-		if err := c.C.Find(q, id).Error; err != nil {
+		if err := c.C.Preload("Account").Find(q, id).Error; err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return nil
 		}
 		if r.Method == http.MethodPost {
 			if err := c.C.Delete(q).Error; err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return nil
+			}
+			q.Account.QueueLength--
+			if err := c.C.Save(q.Account).Error; err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return nil
 			}

@@ -52,6 +52,7 @@ func (t *Tweeter) nextTweetCh(c *db.Connection) <-chan time.Time {
 		Order("next_tweet_time").
 		Where("queue_length > 0").
 		First(a).Error; err != nil {
+		t.log.Debug("no upcoming tweets")
 		return nil
 	}
 	nextTweet := time.Unix(a.LastTweet+a.TweetInterval, 0).Sub(time.Now())
