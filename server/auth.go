@@ -21,7 +21,7 @@ const (
 func (s *Server) loadUser(r *http.Request) *http.Request {
 	session, _ := s.store.Get(r, sessionName)
 	v, _ := session.Values[sessionUserID]
-	if v != "" {
+	if v != nil {
 		u := &db.User{}
 		if err := s.database.C.First(u, v).Error; err == nil {
 			r = r.WithContext(context.WithValue(r.Context(), contextUser, u))
