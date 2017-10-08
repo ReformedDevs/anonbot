@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/ReformedDevs/anonbot/db"
@@ -22,61 +21,73 @@ func (s *Server) suggestions(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Server) newSuggestion(w http.ResponseWriter, r *http.Request) {
-	accounts := []*db.Account{}
-	if err := s.database.C.Find(&accounts).Error; err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	ctx := pongo2.Context{
-		"title":    "New Suggestion",
-		"accounts": accounts,
-	}
-	if r.Method == http.MethodPost {
-		for {
-			var (
-				text         = r.Form.Get("text")
-				accountIDStr = r.Form.Get("account_id")
-				accountID, _ = strconv.ParseInt(accountIDStr, 10, 64)
-				su           = &db.Suggestion{
-					Date:      time.Now(),
-					Text:      text,
-					UserID:    r.Context().Value(contextUser).(*db.User).ID,
-					AccountID: accountID,
-				}
-			)
-			ctx["text"] = text
-			ctx["account_id"] = accountID
-			if len(text) == 0 {
-				ctx["error"] = "invalid text"
-				break
+type editSuggestionForm struct {
+	Text      string
+	MediaURL  string
+	AccountID int64
+}
+
+func (s *Server) editSuggestion(w http.ResponseWriter, r *http.Request) {
+	s.database.Transaction(func(c *db.Connection) error {
+		var (
+			id = mux.Vars(r)["id"]
+			u  = r.Context().Value(contextUser).(*db.User)
+			su = &db.Suggestion{
+				Date:   time.Now(),
+				UserID: u.ID,
 			}
-			if err := s.database.C.Create(su).Error; err != nil {
-				ctx["error"] = "unable to create suggestion"
-				break
+			form = &editSuggestionForm{}
+			ctx  = pongo2.Context{
+				"form": form,
+			}
+		)
+		if len(id) != 0 {
+			if err := c.C.Find(su, id).Error; err != nil {
+				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+				return nil
+			}
+			if su.UserID != u.ID && !u.IsAdmin {
+				http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+				return nil
+			}
+			s.copyStruct(su, form)
+			ctx["title"] = "Edit Suggestion"
+			ctx["action"] = "Save"
+		} else {
+			ctx["title"] = "New Suggestion"
+			ctx["action"] = "Create"
+		}
+		if r.Method == http.MethodPost {
+			s.populateStruct(r.Form, form)
+			s.copyStruct(form, su)
+			if err := c.C.Save(su).Error; err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return nil
 			}
 			http.Redirect(w, r, "/suggestions", http.StatusFound)
-			return
+			return nil
 		}
-	}
-	s.render(w, r, "newsuggestion.html", ctx)
+		accounts := []*db.Account{}
+		if err := c.C.Find(&accounts).Error; err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return nil
+		}
+		ctx["accounts"] = accounts
+		s.render(w, r, "editsuggestion.html", ctx)
+		return nil
+	})
 }
 
 func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 	s.database.Transaction(func(c *db.Connection) error {
 		var (
-			id  = mux.Vars(r)["id"]
-			su  = &db.Suggestion{}
-			ctx = pongo2.Context{
-				"title":      "Queue Suggestion",
-				"suggestion": su,
-			}
+			id = mux.Vars(r)["id"]
+			su = &db.Suggestion{}
 		)
 		if err := c.C.Preload("Account").Find(su, id).Error; err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return nil
 		}
-		ctx["text"] = su.Text
 		if r.Method == http.MethodPost {
 			for {
 				if err := c.C.Delete(su).Error; err != nil {
@@ -85,7 +96,8 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 				}
 				q := &db.QueueItem{
 					Date:      time.Now(),
-					Text:      r.Form.Get("text"),
+					Text:      su.Text,
+					MediaURL:  su.MediaURL,
 					UserID:    su.UserID,
 					AccountID: su.AccountID,
 				}
@@ -103,7 +115,40 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 				return nil
 			}
 		}
-		s.render(w, r, "queuesuggestion.html", ctx)
+		s.render(w, r, "queuesuggestion.html", pongo2.Context{
+			"title": "Queue Suggestion",
+		})
+		return nil
+	})
+}
+
+func (s *Server) deleteSuggestion(w http.ResponseWriter, r *http.Request) {
+	s.database.Transaction(func(c *db.Connection) error {
+		var (
+			id = mux.Vars(r)["id"]
+			u  = r.Context().Value(contextUser).(*db.User)
+			su = &db.Suggestion{}
+		)
+		if err := c.C.Find(su, id).Error; err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return nil
+		}
+		if su.UserID != u.ID && !u.IsAdmin {
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return nil
+		}
+		if r.Method == http.MethodPost {
+			if err := c.C.Delete(su).Error; err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return nil
+			}
+			http.Redirect(w, r, "/suggestions", http.StatusFound)
+			return nil
+		}
+		s.render(w, r, "delete.html", pongo2.Context{
+			"title": "Delete Suggestion",
+			"name":  "this suggestion",
+		})
 		return nil
 	})
 }

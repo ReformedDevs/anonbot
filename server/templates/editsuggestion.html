@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="ui container">
-        <h2>New Suggestion</h2>
+        <h2>{{ title }}</h2>
         <p>Use the form below to create a new suggestion:</p>
         {% if error %}
             <div class="ui negative message">
@@ -11,7 +11,7 @@
         {% endif %}
         <form class="ui form" method="post">
             <div class="field">
-                <select class="ui fluid dropdown" name="account_id">
+                <select class="ui fluid dropdown" name="AccountID">
                     {% for a in accounts %}
                         <option value="{{ a.ID }}">{{ a.Name }}</option>
                     {% endfor %}
@@ -20,10 +20,16 @@
             <div class="field">
                 <div class="ui left icon input">
                     <i class="comment icon"></i>
-                    <input type="text" placeholder="Text" name="text" value="{{ text }}">
+                    <input type="text" placeholder="Text" name="Text" value="{{ form.Text }}">
                 </div>
             </div>
-            <button type="submit" class="ui primary button">Create</button>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="photo icon"></i>
+                    <input type="text" placeholder="Media URL (blank for none)" name="MediaURL" value="{{ form.MediaURL }}">
+                </div>
+            </div>
+            <button type="submit" class="ui primary button">{{ action }}</button>
         </form>
     </div>
 {% endblock %}

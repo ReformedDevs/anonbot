@@ -27,8 +27,14 @@
                         </td>
                         {% if user.IsAdmin %}
                             <td class="collapsing">
+                                <a href="/suggestions/{{ s.ID }}/edit" class="ui mini button">
+                                    Edit
+                                </a>
                                 <a href="/suggestions/{{ s.ID }}/queue" class="ui primary mini button">
                                     Queue
+                                </a>
+                                <a href="/suggestions/{{ s.ID }}/delete" class="ui negative mini button">
+                                    Delete
                                 </a>
                             </td>
                         {% endif %}

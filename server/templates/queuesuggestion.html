@@ -3,20 +3,9 @@
 {% block content %}
     <div class="ui container">
         <h2>Queue Suggestion</h2>
-        <p>Use the form below to edit the tweet before queueing it.</p>
-        {% if error %}
-            <div class="ui negative message">
-                Error: {{ error }}
-            </div>
-        {% endif %}
+        <p>Are you sure you wish to queue this tweet?</p>
         <form class="ui form" method="post">
-            <div class="field">
-                <div class="ui left icon input">
-                    <i class="comment icon"></i>
-                    <input type="text" placeholder="Text" name="text" value="{{ text }}">
-                </div>
-            </div>
-            <button type="submit" class="ui primary button">Queue</button>
+            <button type="submit" class="ui primary button">Confirm</button>
         </form>
     </div>
 {% endblock %}
