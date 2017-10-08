@@ -145,9 +145,10 @@ func main() {
 
 		// Create the server
 		s, err := server.New(&server.Config{
-			Addr:     c.String("server-addr"),
-			Database: d,
-			Tweeter:  t,
+			Addr:      c.String("server-addr"),
+			SecretKey: c.String("secret-key"),
+			Database:  d,
+			Tweeter:   t,
 		})
 		if err != nil {
 			return err
