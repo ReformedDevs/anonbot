@@ -23,6 +23,7 @@ func (s *Server) users(w http.ResponseWriter, r *http.Request) {
 type editUserForm struct {
 	Username string
 	Email    string
+	IsActive bool
 	IsAdmin  bool
 }
 

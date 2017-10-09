@@ -36,10 +36,16 @@
             </div>
             <div class="field">
                 <div class="ui slider checkbox">
+                    <input type="checkbox" name="IsActive"{% if form.IsActive %} checked="checked"{% endif%}>
+                    <label>Is active</label>
+                </div>
+              </div>
+            <div class="field">
+                <div class="ui slider checkbox">
                     <input type="checkbox" name="IsAdmin"{% if form.IsAdmin %} checked="checked"{% endif%}>
                     <label>Is admin</label>
                 </div>
-              </div>
+            </div>
             <button type="submit" class="ui primary button">{{ action }}</button>
         </form>
     </div>

@@ -53,17 +53,6 @@ func (s *Server) requireAdmin(fn http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func (s *Server) loginUser(w http.ResponseWriter, r *http.Request, u *db.User) {
-	session, _ := s.store.Get(r, sessionName)
-	session.Values[sessionUserID] = u.ID
-	session.Save(r, w)
-	redir := r.URL.Query().Get("url")
-	if len(redir) == 0 {
-		redir = "/"
-	}
-	http.Redirect(w, r, redir, http.StatusFound)
-}
-
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	ctx := pongo2.Context{
 		"title": "Login",
@@ -81,11 +70,22 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 				ctx["error"] = invalidCredentials
 				break
 			}
+			if !u.IsActive {
+				ctx["error"] = "account is not active"
+				break
+			}
 			if err := u.Authenticate(password); err != nil {
 				ctx["error"] = invalidCredentials
 				break
 			}
-			s.loginUser(w, r, u)
+			session, _ := s.store.Get(r, sessionName)
+			session.Values[sessionUserID] = u.ID
+			session.Save(r, w)
+			redir := r.URL.Query().Get("url")
+			if len(redir) == 0 {
+				redir = "/"
+			}
+			http.Redirect(w, r, redir, http.StatusFound)
 			return
 		}
 	}
@@ -126,7 +126,7 @@ func (s *Server) register(w http.ResponseWriter, r *http.Request) {
 				ctx["error"] = "unable to create user"
 				break
 			}
-			s.loginUser(w, r, u)
+			http.Redirect(w, r, "/", http.StatusFound)
 			return
 		}
 	}
@@ -135,7 +135,7 @@ func (s *Server) register(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) logout(w http.ResponseWriter, r *http.Request) {
 	session, _ := s.store.Get(r, sessionName)
-	session.Values[sessionUserID] = ""
+	session.Values[sessionUserID] = nil
 	session.Save(r, w)
 	http.Redirect(w, r, "/", http.StatusFound)
 }
