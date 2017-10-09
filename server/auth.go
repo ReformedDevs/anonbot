@@ -12,8 +12,10 @@ import (
 const (
 	contextUser = "user"
 
-	sessionName   = "session"
-	sessionUserID = "userID"
+	sessionName         = "session"
+	sessionUserID       = "userID"
+	sessionAccessToken  = "accessToken"
+	sessionAccessSecret = "accessSecret"
 
 	invalidCredentials = "invalid username or password"
 )

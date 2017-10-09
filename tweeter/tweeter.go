@@ -1,17 +1,20 @@
 package tweeter
 
 import (
+	"fmt"
 	"net/url"
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/ReformedDevs/anonbot/db"
+	"github.com/garyburd/go-oauth/oauth"
 	"github.com/sirupsen/logrus"
 )
 
 // Tweeter takes care of sending tweets at regularly scheduled intervals. In
 // addition, the type may be used to interact with the Twitter API.
 type Tweeter struct {
+	serverURL string
 	database  *db.Connection
 	log       *logrus.Entry
 	triggerCh chan bool
@@ -53,6 +56,7 @@ func New(cfg *Config) *Tweeter {
 	anaconda.SetConsumerKey(cfg.ConsumerKey)
 	anaconda.SetConsumerSecret(cfg.ConsumerSecret)
 	t := &Tweeter{
+		serverURL: cfg.ServerURL,
 		database:  cfg.Database,
 		log:       logrus.WithField("context", "tweeter"),
 		triggerCh: make(chan bool),
@@ -65,6 +69,31 @@ func New(cfg *Config) *Tweeter {
 // Trigger hints to the tweeter that a new tweet is available in the database.
 func (t *Tweeter) Trigger() {
 	t.triggerCh <- true
+}
+
+// Authorize begins the authorization process for an account. The URL to
+// redirect the user to and the temporary credentials are returned.
+func (t *Tweeter) Authorize(a *db.Account) (string, string, string, error) {
+	u, c, err := anaconda.AuthorizationURL(
+		fmt.Sprintf("%s/accounts/%d/complete", t.serverURL, a.ID),
+	)
+	if err != nil {
+		return "", "", "", err
+	}
+	return u, c.Token, c.Secret, nil
+}
+
+// Complete finishes the OAuth process. The access token and secret are
+// returned.
+func (t *Tweeter) Complete(accessToken, accessSecret, verifier string) (string, string, error) {
+	c, _, err := anaconda.GetCredentials(&oauth.Credentials{
+		Token:  accessToken,
+		Secret: accessSecret,
+	}, verifier)
+	if err != nil {
+		return "", "", err
+	}
+	return c.Token, c.Secret, nil
 }
 
 // Mentions returns recent mentions for the account.

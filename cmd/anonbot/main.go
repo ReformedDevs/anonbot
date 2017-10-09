@@ -48,6 +48,11 @@ func main() {
 			Usage:  "server driver",
 		},
 		cli.StringFlag{
+			Name:   "server-url",
+			EnvVar: "SERVER_URL",
+			Usage:  "FQDN of the server",
+		},
+		cli.StringFlag{
 			Name:   "twitter-consumer-key",
 			EnvVar: "TWITTER_CONSUMER_KEY",
 			Usage:  "Twitter API consumer key",
@@ -151,6 +156,7 @@ func main() {
 		t := tweeter.New(&tweeter.Config{
 			ConsumerKey:    c.String("twitter-consumer-key"),
 			ConsumerSecret: c.String("twitter-consumer-secret"),
+			ServerURL:      c.String("server-url"),
 			Database:       d,
 		})
 		defer t.Close()

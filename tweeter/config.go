@@ -7,5 +7,6 @@ import (
 type Config struct {
 	ConsumerKey    string
 	ConsumerSecret string
+	ServerURL      string
 	Database       *db.Connection
 }

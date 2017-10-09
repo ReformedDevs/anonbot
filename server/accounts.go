@@ -55,8 +55,6 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 
 type editAccountForm struct {
 	Name          string
-	AccessToken   string
-	AccessSecret  string
 	TweetInterval int64
 }
 
@@ -96,6 +94,62 @@ func (s *Server) editAccount(w http.ResponseWriter, r *http.Request) {
 			return nil
 		}
 		s.render(w, r, "editaccount.html", ctx)
+		return nil
+	})
+}
+
+func (s *Server) authorizeAccount(w http.ResponseWriter, r *http.Request) {
+	var (
+		id = mux.Vars(r)["id"]
+		a  = &db.Account{}
+	)
+	if err := s.database.C.Find(a, id).Error; err != nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	u, accessToken, accessSecret, err := s.tweeter.Authorize(a)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	session, _ := s.store.Get(r, sessionName)
+	session.Values[sessionAccessToken] = accessToken
+	session.Values[sessionAccessSecret] = accessSecret
+	session.Save(r, w)
+	http.Redirect(w, r, u, http.StatusFound)
+}
+
+func (s *Server) completeAccount(w http.ResponseWriter, r *http.Request) {
+	s.database.Transaction(func(c *db.Connection) error {
+		var (
+			id = mux.Vars(r)["id"]
+			a  = &db.Account{}
+		)
+		if err := c.C.Find(a, id).Error; err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+			return nil
+		}
+		var (
+			session, _      = s.store.Get(r, sessionName)
+			accessToken, _  = session.Values[sessionAccessToken].(string)
+			accessSecret, _ = session.Values[sessionAccessSecret].(string)
+		)
+		accessToken, accessSecret, err := s.tweeter.Complete(
+			accessToken,
+			accessSecret,
+			r.FormValue("oauth_verifier"),
+		)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return nil
+		}
+		a.AccessToken = accessToken
+		a.AccessSecret = accessSecret
+		if err := c.C.Save(a).Error; err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return nil
+		}
+		http.Redirect(w, r, "/accounts", http.StatusFound)
 		return nil
 	})
 }
