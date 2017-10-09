@@ -47,6 +47,16 @@ func main() {
 			EnvVar: "SERVER_ADDR",
 			Usage:  "server driver",
 		},
+		cli.StringFlag{
+			Name:   "twitter-consumer-key",
+			EnvVar: "TWITTER_CONSUMER_KEY",
+			Usage:  "Twitter API consumer key",
+		},
+		cli.StringFlag{
+			Name:   "twitter-consumer-secret",
+			EnvVar: "TWITTER_CONSUMER_SECRET",
+			Usage:  "Twitter API consumer secret ",
+		},
 	}
 	app.Before = func(c *cli.Context) error {
 		if c.Bool("debug") {
@@ -139,7 +149,9 @@ func main() {
 
 		// Create the tweeter
 		t := tweeter.New(&tweeter.Config{
-			Database: d,
+			ConsumerKey:    c.String("twitter-consumer-key"),
+			ConsumerSecret: c.String("twitter-consumer-secret"),
+			Database:       d,
 		})
 		defer t.Close()
 

@@ -5,5 +5,7 @@ import (
 )
 
 type Config struct {
-	Database *db.Connection
+	ConsumerKey    string
+	ConsumerSecret string
+	Database       *db.Connection
 }

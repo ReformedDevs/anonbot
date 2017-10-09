@@ -54,12 +54,10 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 type editAccountForm struct {
-	Name           string
-	ConsumerKey    string
-	ConsumerSecret string
-	AccessToken    string
-	AccessSecret   string
-	TweetInterval  int64
+	Name          string
+	AccessToken   string
+	AccessSecret  string
+	TweetInterval int64
 }
 
 func (s *Server) editAccount(w http.ResponseWriter, r *http.Request) {

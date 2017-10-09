@@ -2,7 +2,6 @@ package tweeter
 
 import (
 	"net/url"
-	"sync"
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
@@ -13,17 +12,10 @@ import (
 // Tweeter takes care of sending tweets at regularly scheduled intervals. In
 // addition, the type may be used to interact with the Twitter API.
 type Tweeter struct {
-	mutex     sync.Mutex
 	database  *db.Connection
 	log       *logrus.Entry
 	triggerCh chan bool
 	stoppedCh chan bool
-}
-
-func (t *Tweeter) activate(a *db.Account) *anaconda.TwitterApi {
-	anaconda.SetConsumerKey(a.ConsumerKey)
-	anaconda.SetConsumerSecret(a.ConsumerSecret)
-	return anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret)
 }
 
 func (t *Tweeter) run() {
@@ -58,6 +50,8 @@ func (t *Tweeter) run() {
 
 // New creates a new tweeter instance from the specified configuration.
 func New(cfg *Config) *Tweeter {
+	anaconda.SetConsumerKey(cfg.ConsumerKey)
+	anaconda.SetConsumerSecret(cfg.ConsumerSecret)
 	t := &Tweeter{
 		database:  cfg.Database,
 		log:       logrus.WithField("context", "tweeter"),
@@ -75,16 +69,12 @@ func (t *Tweeter) Trigger() {
 
 // Mentions returns recent mentions for the account.
 func (t *Tweeter) Mentions(a *db.Account) ([]anaconda.Tweet, error) {
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
-	return t.activate(a).GetMentionsTimeline(nil)
+	return anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret).GetMentionsTimeline(nil)
 }
 
 // Reply replies to the tweet with the specified ID.
 func (t *Tweeter) Reply(a *db.Account, id, text string) error {
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
-	_, err := t.activate(a).PostTweet(text, url.Values{
+	_, err := anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret).PostTweet(text, url.Values{
 		"in_reply_to_status_id": []string{id},
 	})
 	return err
