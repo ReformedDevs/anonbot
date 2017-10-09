@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>{{ title }}</h2>
+        <p>Use the tools below to interact with the account:</p>
+        <h4 class="ui dividing header">Mentions</h4>
+        <div class="ui comments">
+            {% for m in mentions %}
+                {% if forloop.Counter0 %}
+                    <div class="ui divider"></div>
+                {% endif %}
+                <div class="comment">
+                    <a class="avatar">
+                        <img src="{{ m.User.ProfileImageURL }}">
+                    </a>
+                    <div class="content">
+                        <a class="author">{{ m.User.Name }}</a>
+                        <div class="metadata">
+                            <span class="date">
+                                {{ m.CreatedAt }}
+                            </span>
+                        </div>
+                        <div class="text">
+                            {{ m.Text }}
+                        </div>
+                        <div class="actions">
+                            <a class="reply">Reply</a>
+                        </div>
+                        <form method="post" class="ui reply form hidden">
+                            <input type="hidden" name="id" value="{{ m.Id }}">
+                            <div class="field">
+                                <textarea name="text" rows="2">@{{ m.User.ScreenName }} </textarea>
+                            </div>
+                            <button type="submit" class="ui primary submit labeled icon mini button">
+                                <i class="icon edit"></i> Reply
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

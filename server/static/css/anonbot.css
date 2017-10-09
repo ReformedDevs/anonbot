@@ -18,6 +18,14 @@ body {
     width: 100%;
 }
 
+.hidden {
+    display: none;
+}
+
+.ui.comments .reply.form textarea {
+    height: auto;
+}
+
 /* Enforce a smaller max width */
 @media only screen and (min-width: 992px) {
     .ui.container {

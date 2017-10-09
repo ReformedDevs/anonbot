@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ReformedDevs/anonbot/db"
@@ -17,6 +18,38 @@ func (s *Server) accounts(w http.ResponseWriter, r *http.Request) {
 	s.render(w, r, "accounts.html", pongo2.Context{
 		"title":    "Accounts",
 		"accounts": accounts,
+	})
+}
+
+func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
+	var (
+		id = mux.Vars(r)["id"]
+		a  = &db.Account{}
+	)
+	if err := s.database.C.Find(a, id).Error; err != nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	if r.Method == http.MethodPost {
+		var (
+			id   = r.Form.Get("id")
+			text = r.Form.Get("text")
+		)
+		if err := s.tweeter.Reply(a, id, text); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/accounts/%d", a.ID), http.StatusFound)
+		return
+	}
+	m, err := s.tweeter.Mentions(a)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	s.render(w, r, "viewaccount.html", pongo2.Context{
+		"title":    a.Name,
+		"mentions": m,
 	})
 }
 

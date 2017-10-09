@@ -74,8 +74,10 @@
             </div>
         {% endblock %}
 
-        <script src="/static/js/jquery.min.js"></script>
-        <script src="/static/js/semantic.min.js"></script>
-        <script src="/static/js/anonbot.js"></script>
+        {% block scripts %}
+            <script src="/static/js/jquery.min.js"></script>
+            <script src="/static/js/semantic.min.js"></script>
+            <script src="/static/js/anonbot.js"></script>
+        {% endblock %}
     </body>
 </html>

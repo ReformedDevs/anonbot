@@ -4,16 +4,15 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ChimeraCoder/anaconda"
 	"github.com/ReformedDevs/anonbot/db"
 )
 
 func (t *Tweeter) tweet(c *db.Connection, a *db.Account, q *db.QueueItem) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
 	t.log.Infof("tweeting from %s...", a.Name)
-	anaconda.SetConsumerKey(a.ConsumerKey)
-	anaconda.SetConsumerSecret(a.ConsumerSecret)
 	var (
-		api = anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret)
+		api = t.activate(a)
 		v   = url.Values{}
 	)
 	if len(q.MediaURL) != 0 {

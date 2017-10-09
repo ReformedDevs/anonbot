@@ -17,7 +17,11 @@
             <tbody>
                 {% for a in accounts %}
                     <tr>
-                        <td>{{ a.Name }}</td>
+                        <td>
+                            <a href="/accounts/{{ a.ID }}">
+                                {{ a.Name }}
+                            </a>
+                        </td>
                         <td>{{ a.QueueLength }}</td>
                         <td>{{ a.TweetInterval }}</td>
                         <td>
