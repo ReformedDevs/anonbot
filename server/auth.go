@@ -126,6 +126,7 @@ func (s *Server) register(w http.ResponseWriter, r *http.Request) {
 				ctx["error"] = "unable to create user"
 				break
 			}
+			s.addAlert(w, r, "Thank you for registering. Please wait for an admin to activate your account.")
 			http.Redirect(w, r, "/", http.StatusFound)
 			return
 		}

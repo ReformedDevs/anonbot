@@ -59,6 +59,13 @@
                     </div>
                 </div>
             </div>
+            {% for a in alerts %}
+                <div class="ui container">
+                    <div class="ui info message">
+                        {{ a }}
+                    </div>
+                </div>
+            {% endfor %}
         {% endblock %}
 
         {% block content %}{% endblock %}

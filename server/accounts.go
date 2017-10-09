@@ -39,6 +39,7 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		s.addAlert(w, r, "Reply has been tweeted.")
 		http.Redirect(w, r, fmt.Sprintf("/accounts/%d", a.ID), http.StatusFound)
 		return
 	}
@@ -149,6 +150,7 @@ func (s *Server) completeAccount(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return nil
 		}
+		s.addAlert(w, r, "Account has been authorized.")
 		http.Redirect(w, r, "/accounts", http.StatusFound)
 		return nil
 	})

@@ -26,6 +26,10 @@ body {
     height: auto;
 }
 
+.ui.message {
+    margin-bottom: 24px !important;
+}
+
 /* Enforce a smaller max width */
 @media only screen and (min-width: 992px) {
     .ui.container {

@@ -14,6 +14,7 @@ func (s *Server) render(w http.ResponseWriter, r *http.Request, templateName str
 		return
 	}
 	ctx["user"] = r.Context().Value(contextUser)
+	ctx["alerts"] = s.getAlerts(w, r)
 	b, err := t.ExecuteBytes(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
