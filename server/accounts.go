@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/ReformedDevs/anonbot/db"
@@ -28,19 +27,6 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 	)
 	if err := s.database.C.Find(a, id).Error; err != nil {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-	if r.Method == http.MethodPost {
-		var (
-			id   = r.Form.Get("id")
-			text = r.Form.Get("text")
-		)
-		if err := s.tweeter.Reply(a, id, text); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		s.addAlert(w, r, "Reply has been tweeted.")
-		http.Redirect(w, r, fmt.Sprintf("/accounts/%d", a.ID), http.StatusFound)
 		return
 	}
 	m, err := s.tweeter.Mentions(a)

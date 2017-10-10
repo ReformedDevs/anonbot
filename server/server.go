@@ -64,6 +64,7 @@ func New(cfg *Config) (*Server, error) {
 	s.router.HandleFunc("/accounts", s.requireAdmin(s.accounts))
 	s.router.HandleFunc("/accounts/new", s.requireAdmin(s.editAccount))
 	s.router.HandleFunc("/accounts/{id:[0-9]+}", s.requireAdmin(s.viewAccount))
+	s.router.HandleFunc("/accounts/{id:[0-9]+}/ajax", s.requireAdmin(s.ajaxAccount))
 	s.router.HandleFunc("/accounts/{id:[0-9]+}/edit", s.requireAdmin(s.editAccount))
 	s.router.HandleFunc("/accounts/{id:[0-9]+}/authorize", s.requireAdmin(s.authorizeAccount))
 	s.router.HandleFunc("/accounts/{id:[0-9]+}/complete", s.requireAdmin(s.completeAccount))

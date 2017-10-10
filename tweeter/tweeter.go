@@ -96,6 +96,12 @@ func (t *Tweeter) Complete(accessToken, accessSecret, verifier string) (string, 
 	return c.Token, c.Secret, nil
 }
 
+// Like favorites the specified tweet.
+func (t *Tweeter) Like(a *db.Account, id int64) error {
+	_, err := anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret).Favorite(id)
+	return err
+}
+
 // Mentions returns recent mentions for the account.
 func (t *Tweeter) Mentions(a *db.Account) ([]anaconda.Tweet, error) {
 	return anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret).GetMentionsTimeline(nil)
