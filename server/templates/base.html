@@ -81,6 +81,22 @@
             </div>
         {% endblock %}
 
+        <!-- Error modal -->
+        <div class="ui mini modal error">
+            <div class="header">
+                Error
+            </div>
+            <div class="content">
+                An error has occurred while processing this request.
+                Details are provided below:
+                <br><br>
+                <span class="message"></span>
+            </div>
+            <div class="actions">
+                <button type="button" class="ui primary approve button">OK</button>
+            </div>
+        </div>
+
         {% block scripts %}
             <script src="/static/js/jquery.min.js"></script>
             <script src="/static/js/semantic.min.js"></script>

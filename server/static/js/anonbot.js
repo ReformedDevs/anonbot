@@ -20,7 +20,19 @@ $(function() {
         });
     }
 
-    // Make the function accessible to other code on the page
+    // Setup the error dialog
+    var $modal = $('.error.modal').modal({
+            closable: false,
+            duration: 0
+        });
+
+    // Show the error message dialog
+    function error(m) {
+        $modal.modal('show').find('.message').html(m);
+    }
+
+    // Make the functions accessible to other code on the page
     window.ajax = ajax;
+    window.error = error;
 
 });
