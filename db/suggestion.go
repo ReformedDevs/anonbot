@@ -16,5 +16,5 @@ type Suggestion struct {
 	Account   *Account `gorm:"ForeignKey:AccountID"`
 	AccountID int64    `sql:"type:int REFERENCES accounts(id) ON DELETE CASCADE"`
 	Votes     []*Vote  `gorm:"ForeignKey:SuggestionID"`
-	VoteCount int64
+	VoteCount int64    `gorm:"not null"`
 }

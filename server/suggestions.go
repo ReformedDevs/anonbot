@@ -16,7 +16,7 @@ func (s *Server) suggestions(w http.ResponseWriter, r *http.Request) {
 		suggestions = []*db.Suggestion{}
 	)
 	if r.FormValue("order") == "votes" {
-		order = "account_id, vote_count desc"
+		order = "account_id, vote_count desc, date"
 	}
 	if err := s.database.C.
 		Preload("User").
