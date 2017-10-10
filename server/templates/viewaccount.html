@@ -36,7 +36,6 @@
                                 <a href="#"{% if m.Favorited %} class="hidden"{% endif %}>
                                     <i class="heart icon"></i>
                                     Like
-                                    <span class="text-error"></span>
                                 </a>
                                 <span class="text-success{% if not m.Favorited %} hidden{% endif %}">
                                     <i class="heart icon"></i>
@@ -134,22 +133,19 @@
 
                 // Like the tweet when clicked
                 $a.click(function() {
-                    var $icon = $('.icon', $a),
-                        $error = $('.text-error', $a).hide(),
-                        $spinner = $('<i>').addClass('spinner loading icon');
-                    $a.after($spinner).detach();
-                    window.ajax('like', {
-                        account_id: "{{ account.ID }}",
-                        tweet_id: tweetId
-                    })
-                    .done(function() {
-                        $spinner.remove();
-                        $success.removeClass('hidden');
-                    })
-                    .fail(function(jqXHR) {
-                        $error.text('(' + jqXHR.responseText + ')').show();
-                        $spinner.after($a).remove();
-                    });
+                    window.spinner($a,
+                        window.ajax('like', {
+                            account_id: "{{ account.ID }}",
+                            tweet_id: tweetId
+                        })
+                        .done(function() {
+                            $a.addClass('hidden');
+                            $success.removeClass('hidden');
+                        })
+                        .fail(function(jqXHR) {
+                            window.error(jqXHR.responseText);
+                        })
+                    );
                 });
             });
         });

@@ -31,8 +31,18 @@ $(function() {
         $modal.modal('show').find('.message').html(m);
     }
 
+    // Create a spinner to replace an object while a request is active
+    function spinner($e, jqXHR) {
+        var $spinner = $('<i>').addClass('spinner loading icon');
+        $e.after($spinner).detach();
+        jqXHR.always(function() {
+            $spinner.after($e).remove();
+        });
+    }
+
     // Make the functions accessible to other code on the page
     window.ajax = ajax;
     window.error = error;
+    window.spinner = spinner;
 
 });
