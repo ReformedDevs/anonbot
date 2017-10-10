@@ -77,12 +77,32 @@ func (s *Server) editAccount(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return nil
 			}
-			s.tweeter.Trigger()
+			s.tweeter.Trigger(nil)
 			http.Redirect(w, r, "/accounts", http.StatusFound)
 			return nil
 		}
 		s.render(w, r, "editaccount.html", ctx)
 		return nil
+	})
+}
+
+func (s *Server) advanceAccount(w http.ResponseWriter, r *http.Request) {
+	var (
+		id = mux.Vars(r)["id"]
+		a  = &db.Account{}
+	)
+	if err := s.database.C.Find(a, id).Error; err != nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	if r.Method == http.MethodPost {
+		s.tweeter.Trigger(a)
+		http.Redirect(w, r, "/accounts", http.StatusFound)
+		return
+	}
+	s.render(w, r, "confirm.html", pongo2.Context{
+		"title":  "Advance Account",
+		"action": "advance the account",
 	})
 }
 

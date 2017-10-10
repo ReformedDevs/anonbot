@@ -2,8 +2,8 @@
 
 {% block content %}
     <div class="ui container">
-        <h2>Queue Suggestion</h2>
-        <p>Are you sure you wish to queue this tweet?</p>
+        <h2>{{ title }}</h2>
+        <p>Are you sure you wish to {{ action }}?</p>
         <form class="ui form" method="post">
             <button type="submit" class="ui primary button">Confirm</button>
         </form>

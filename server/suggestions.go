@@ -110,13 +110,14 @@ func (s *Server) queueSuggestion(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return nil
 				}
-				s.tweeter.Trigger()
+				s.tweeter.Trigger(nil)
 				http.Redirect(w, r, "/suggestions", http.StatusFound)
 				return nil
 			}
 		}
-		s.render(w, r, "queuesuggestion.html", pongo2.Context{
-			"title": "Queue Suggestion",
+		s.render(w, r, "confirm.html", pongo2.Context{
+			"title":  "Queue Suggestion",
+			"action": "queue this tweet",
 		})
 		return nil
 	})

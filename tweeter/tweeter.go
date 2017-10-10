@@ -17,7 +17,7 @@ type Tweeter struct {
 	serverURL string
 	database  *db.Connection
 	log       *logrus.Entry
-	triggerCh chan bool
+	triggerCh chan *db.Account
 	stoppedCh chan bool
 }
 
@@ -25,13 +25,19 @@ func (t *Tweeter) run() {
 	defer close(t.stoppedCh)
 	defer t.log.Info("tweeter has stopped")
 	t.log.Info("starting tweeter...")
+	var a *db.Account
 	for {
 		var nextTweetCh <-chan time.Time
 		err := t.database.Transaction(func(c *db.Connection) error {
-			a, q := t.selectQueuedItem(c)
-			if a != nil && q != nil {
-				if err := t.tweet(c, a, q); err != nil {
-					return err
+			if a == nil {
+				a = t.selectAccount(c)
+			}
+			if a != nil {
+				q := t.selectQueuedItem(c, a)
+				if q != nil {
+					if err := t.tweet(c, a, q); err != nil {
+						return err
+					}
 				}
 			}
 			nextTweetCh = t.nextTweetCh(c)
@@ -43,11 +49,16 @@ func (t *Tweeter) run() {
 		}
 		select {
 		case <-nextTweetCh:
-		case _, ok := <-t.triggerCh:
+		case forceAccount, ok := <-t.triggerCh:
 			if !ok {
 				return
 			}
+			if forceAccount != nil {
+				a = forceAccount
+				continue
+			}
 		}
+		a = nil
 	}
 }
 
@@ -59,16 +70,17 @@ func New(cfg *Config) *Tweeter {
 		serverURL: cfg.ServerURL,
 		database:  cfg.Database,
 		log:       logrus.WithField("context", "tweeter"),
-		triggerCh: make(chan bool),
+		triggerCh: make(chan *db.Account),
 		stoppedCh: make(chan bool),
 	}
 	go t.run()
 	return t
 }
 
-// Trigger hints to the tweeter that a new tweet is available in the database.
-func (t *Tweeter) Trigger() {
-	t.triggerCh <- true
+// Trigger hints to the tweeter that a new tweet is available or forces an
+// account to tweet its next queued item.
+func (t *Tweeter) Trigger(a *db.Account) {
+	t.triggerCh <- a
 }
 
 // Authorize begins the authorization process for an account. The URL to

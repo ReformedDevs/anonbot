@@ -6,22 +6,26 @@ import (
 	"github.com/ReformedDevs/anonbot/db"
 )
 
-func (t *Tweeter) selectQueuedItem(c *db.Connection) (*db.Account, *db.QueueItem) {
+func (t *Tweeter) selectAccount(c *db.Connection) *db.Account {
 	a := &db.Account{}
 	if err := c.C.
 		Where("queue_length > 0").
 		Where("last_tweet + tweet_interval <= ?", time.Now().Unix()).
 		First(a).Error; err != nil {
-		return nil, nil
+		return nil
 	}
+	return a
+}
+
+func (t *Tweeter) selectQueuedItem(c *db.Connection, a *db.Account) *db.QueueItem {
 	q := &db.QueueItem{}
 	if err := c.C.
 		Order("date").
 		Where("account_id = ?", a.ID).
 		First(q).Error; err != nil {
-		return nil, nil
+		return nil
 	}
-	return a, q
+	return q
 }
 
 func (t *Tweeter) nextTweetCh(c *db.Connection) <-chan time.Time {
