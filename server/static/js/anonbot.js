@@ -31,12 +31,13 @@ $(function() {
         $modal.modal('show').find('.message').html(m);
     }
 
-    // Create a spinner to replace an object while a request is active
+    // Create a spinner to show in place of an object while a request is active
     function spinner($e, jqXHR) {
         var $spinner = $('<i>').addClass('spinner loading icon');
-        $e.after($spinner).detach();
+        $e.after($spinner).hide();
         jqXHR.always(function() {
-            $spinner.after($e).remove();
+            $spinner.remove();
+            $e.show();
         });
     }
 

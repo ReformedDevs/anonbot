@@ -10,8 +10,16 @@ import (
 )
 
 func (s *Server) suggestions(w http.ResponseWriter, r *http.Request) {
-	suggestions := []*db.Suggestion{}
-	if err := s.database.C.Preload("User").Preload("Account").Find(&suggestions).Error; err != nil {
+	var (
+		u           = r.Context().Value(contextUser).(*db.User)
+		suggestions = []*db.Suggestion{}
+	)
+	if err := s.database.C.
+		Preload("User").
+		Preload("Account").
+		Preload("Votes", "user_id = ?", u.ID).
+		Order("date").
+		Find(&suggestions).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
