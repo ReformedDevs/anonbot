@@ -17,7 +17,7 @@ type ajaxActionVote struct {
 	SuggestionID string `json:"suggestion_id"`
 }
 
-type ajaxActionReply struct {
+type ajaxActionTweet struct {
 	AccountID string `json:"account_id"`
 	TweetID   string `json:"tweet_id"`
 	Text      string `json:"text"`
@@ -80,22 +80,22 @@ func (s *Server) ajax(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			return nil
 		})
-	case "reply":
+	case "tweet":
 		if !u.IsAdmin {
 			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 			return
 		}
-		reply := &ajaxActionReply{}
-		if err := json.Unmarshal(action.Data, reply); err != nil {
+		tweet := &ajaxActionTweet{}
+		if err := json.Unmarshal(action.Data, tweet); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		a := &db.Account{}
-		if err := s.database.C.Find(a, reply.AccountID).Error; err != nil {
+		if err := s.database.C.Find(a, tweet.AccountID).Error; err != nil {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
-		if err := s.tweeter.Reply(a, reply.TweetID, reply.Text); err != nil {
+		if err := s.tweeter.Reply(a, tweet.TweetID, tweet.Text); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

@@ -119,11 +119,13 @@ func (t *Tweeter) Mentions(a *db.Account) ([]anaconda.Tweet, error) {
 	return anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret).GetMentionsTimeline(nil)
 }
 
-// Reply replies to the tweet with the specified ID.
+// Tweet sends a tweet, optionally replying to a tweet with the specified ID.
 func (t *Tweeter) Reply(a *db.Account, id, text string) error {
-	_, err := anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret).PostTweet(text, url.Values{
-		"in_reply_to_status_id": []string{id},
-	})
+	v := url.Values{}
+	if len(id) != 0 {
+		v.Set("in_reply_to_status_id", id)
+	}
+	_, err := anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret).PostTweet(text, v)
 	return err
 }
 

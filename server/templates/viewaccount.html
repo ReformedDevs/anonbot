@@ -4,6 +4,12 @@
     <div class="ui container">
         <h2>{{ title }}</h2>
         <p>Use the tools below to interact with the account:</p>
+        <h4 class="ui dividing header">Tweet</h4>
+        <p>Send a tweet directly from the account using the button below:</p>
+        <a href="#" class="ui labeled icon primary button tweet">
+            <i class="twitter icon"></i>
+            Tweet
+        </a>
         <h4 class="ui dividing header">Mentions</h4>
         <div class="ui comments">
             {% for m in mentions %}
@@ -49,9 +55,9 @@
         </div>
     </div>
 
-    <div class="ui mini modal reply">
+    <div class="ui mini modal tweet">
         <div class="header">
-            Reply
+            Tweet
         </div>
         <div class="content">
             <div class="ui error message"></div>
@@ -64,7 +70,7 @@
             </div>
         </div>
         <div class="actions">
-            <button type="button" class="ui primary approve button">Reply</button>
+            <button type="button" class="ui primary approve button">Send</button>
             <button type="button" class="ui deny button">Cancel</button>
         </div>
     </div>
@@ -77,13 +83,13 @@
         $(function() {
 
             // Set up the modal
-            var $modal = $('.reply.modal').modal({
+            var $modal = $('.tweet.modal').modal({
                     closable: false,
                     duration: 0
                 }),
                 $error = $('.error', $modal),
                 $textarea = $('textarea', $modal),
-                $replyButton = $('.approve.button', $modal),
+                $sendButton = $('.approve.button', $modal),
                 $controls = $textarea.add($('.button', $modal));
 
             var curTweetId;
@@ -93,9 +99,9 @@
                 $error.hide();
             });
             $modal.modal('setting', 'onApprove', function() {
-                $replyButton.addClass('loading');
+                $sendButton.addClass('loading');
                 $controls.prop('disabled', true);
-                window.ajax('reply', {
+                window.ajax('tweet', {
                     account_id: "{{ account.ID }}",
                     tweet_id: curTweetId,
                     text: $textarea.val()
@@ -107,18 +113,25 @@
                     $error.text(jqXHR.responseText).show();
                 })
                 .always(function() {
-                    $replyButton.removeClass('loading');
+                    $sendButton.removeClass('loading');
                     $controls.prop('disabled', false);
                 });
                 return false;
             });
 
-            // Process the tweet actions
+            // Process the primary tweet button
+            $('.tweet.button').click(function() {
+                curTweetId = '';
+                $textarea.val('').focus();
+                $modal.modal('show');
+            });
+
+            // Process the individual tweet actions
             $('.tweet.actions').each(function() {
 
                 // Retrieve the tweet ID and username
-                var tweetId = $(this).data('tweet-id'),
-                    tweetUser = $(this).data('tweet-user');
+                var tweetId = $(this).data('tweet-id').toString(),
+                    tweetUser = $(this).data('tweet-user').toString();
 
                 // Show the dialog when reply is clicked
                 $(this).find('.reply').click(function() {
