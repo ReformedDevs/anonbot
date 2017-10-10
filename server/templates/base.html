@@ -44,6 +44,9 @@
                         {% endif %}
                         <div class="right menu">
                             {% if user %}
+                                <a href="/users/{{ user.ID }}/edit" class="item">
+                                    {{ user.Username }}
+                                </a>
                                 <a href="/logout" class="item">
                                     Logout
                                 </a>

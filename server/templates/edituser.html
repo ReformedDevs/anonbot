@@ -34,18 +34,20 @@
                     <input type="text" placeholder="Email" name="Email" value="{{ form.Email }}">
                 </div>
             </div>
-            <div class="field">
-                <div class="ui slider checkbox">
-                    <input type="checkbox" name="IsActive"{% if form.IsActive %} checked="checked"{% endif%}>
-                    <label>Is active</label>
+            {% if user.IsAdmin %}
+                <div class="field">
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="IsActive"{% if form.IsActive %} checked="checked"{% endif%}>
+                        <label>Is active</label>
+                    </div>
+                  </div>
+                <div class="field">
+                    <div class="ui slider checkbox">
+                        <input type="checkbox" name="IsAdmin"{% if form.IsAdmin %} checked="checked"{% endif%}>
+                        <label>Is admin</label>
+                    </div>
                 </div>
-              </div>
-            <div class="field">
-                <div class="ui slider checkbox">
-                    <input type="checkbox" name="IsAdmin"{% if form.IsAdmin %} checked="checked"{% endif%}>
-                    <label>Is admin</label>
-                </div>
-            </div>
+            {% endif %}
             <button type="submit" class="ui primary button">{{ action }}</button>
         </form>
     </div>

@@ -72,7 +72,7 @@ func New(cfg *Config) (*Server, error) {
 	s.router.HandleFunc("/accounts/{id:[0-9]+}/delete", s.requireAdmin(s.deleteAccount))
 	s.router.HandleFunc("/users", s.requireAdmin(s.users))
 	s.router.HandleFunc("/users/new", s.requireAdmin(s.editUser))
-	s.router.HandleFunc("/users/{id:[0-9]+}/edit", s.requireAdmin(s.editUser))
+	s.router.HandleFunc("/users/{id:[0-9]+}/edit", s.requireLogin(s.editUser))
 	s.router.HandleFunc("/users/{id:[0-9]+}/delete", s.requireAdmin(s.deleteUser))
 	router.PathPrefix("/static").Handler(http.FileServer(HTTP))
 	router.PathPrefix("/").Handler(s)

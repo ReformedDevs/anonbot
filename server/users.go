@@ -30,16 +30,21 @@ type editUserForm struct {
 func (s *Server) editUser(w http.ResponseWriter, r *http.Request) {
 	s.database.Transaction(func(c *db.Connection) error {
 		var (
-			id   = mux.Vars(r)["id"]
-			u    = &db.User{}
-			form = &editUserForm{}
-			ctx  = pongo2.Context{
+			id      = mux.Vars(r)["id"]
+			curUser = r.Context().Value(contextUser).(*db.User)
+			u       = &db.User{}
+			form    = &editUserForm{}
+			ctx     = pongo2.Context{
 				"form": form,
 			}
 		)
 		if len(id) != 0 {
 			if err := c.C.Find(u, id).Error; err != nil {
 				http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+				return nil
+			}
+			if u.ID != curUser.ID && !curUser.IsAdmin {
+				http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
 				return nil
 			}
 			s.copyStruct(u, form)
@@ -67,11 +72,19 @@ func (s *Server) editUser(w http.ResponseWriter, r *http.Request) {
 						return nil
 					}
 				}
+				if !curUser.IsAdmin {
+					u.IsActive = true
+					u.IsAdmin = false
+				}
 				if err := c.C.Save(u).Error; err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return nil
 				}
-				http.Redirect(w, r, "/users", http.StatusFound)
+				if curUser.IsAdmin {
+					http.Redirect(w, r, "/users", http.StatusFound)
+				} else {
+					http.Redirect(w, r, "/", http.StatusFound)
+				}
 				return nil
 			}
 		}
