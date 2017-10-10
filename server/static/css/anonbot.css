@@ -10,6 +10,10 @@ body {
     position: relative;
 }
 
+textarea {
+    height: auto;
+}
+
 .footer {
     bottom: 0;
     margin-top: 40px !important;
@@ -18,12 +22,12 @@ body {
     width: 100%;
 }
 
-.hidden {
-    display: none;
+.text-error {
+    color: #db2828;
 }
 
-.ui.comments .reply.form textarea {
-    height: auto;
+.text-success {
+    color: #00b5ad;
 }
 
 .ui.message {

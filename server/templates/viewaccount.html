@@ -17,28 +17,146 @@
                     <div class="content">
                         <a class="author">{{ m.User.Name }}</a>
                         <div class="metadata">
-                            <span class="date">
+                            <a href="https://twitter.com/statuses/{{ m.Id }}" target="_blank" class="date">
                                 {{ m.CreatedAt }}
-                            </span>
+                            </a>
                         </div>
                         <div class="text">
                             {{ m.Text }}
                         </div>
-                        <div class="actions">
-                            <a class="reply">Reply</a>
+                        <div class="tweet actions"
+                             data-tweet-id="{{ m.Id }}"
+                             data-tweet-user="{{ m.User.ScreenName }}">
+                            <a href="#" class="reply">
+                                <i class="reply icon"></i>
+                                Reply
+                            </a>
+                            &nbsp;
+                            <a href="#" class="like">
+                                <i class="heart icon"></i>
+                                Like
+                                <span class="text-error"></span>
+                            </a>
                         </div>
-                        <form method="post" class="ui reply form hidden">
-                            <input type="hidden" name="id" value="{{ m.Id }}">
-                            <div class="field">
-                                <textarea name="text" rows="2">@{{ m.User.ScreenName }} </textarea>
-                            </div>
-                            <button type="submit" class="ui primary submit labeled icon mini button">
-                                <i class="icon edit"></i> Reply
-                            </button>
-                        </form>
                     </div>
                 </div>
             {% endfor %}
         </div>
     </div>
+
+    <div class="ui mini modal reply">
+        <div class="header">
+            Reply
+        </div>
+        <div class="content">
+            <div class="ui error message"></div>
+            <div class="ui form">
+                <div class="field">
+                    <div class="ui fluid input">
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <button type="button" class="ui primary approve button">Reply</button>
+            <button type="button" class="ui deny button">Cancel</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.Super|safe }}
+    <script>
+
+        // Send an ajax request with the specified data
+        function ajax(a, d) {
+            return $.ajax({
+                type: 'POST',
+                url: '/accounts/{{ account.ID }}/ajax',
+                data: JSON.stringify({
+                    action: a,
+                    data: d
+                }),
+                contentType: 'application/json; charset=utf-8'
+            });
+        }
+
+        // Set up the modal
+        var $modal = $('.reply.modal').modal({
+                closable: false,
+                duration: 0
+            }),
+            $error = $('.error', $modal),
+            $textarea = $('textarea', $modal),
+            $replyButton = $('.approve.button', $modal),
+            $controls = $textarea.add($('.button', $modal));
+
+        // Current tweet ID
+        var curTweetId;
+
+        // Set the handlers
+        $modal.modal('setting', 'onShow', function() {
+            $error.hide();
+        });
+        $modal.modal('setting', 'onApprove', function() {
+            $replyButton.addClass('loading');
+            $controls.prop('disabled', true);
+            ajax('reply', {
+                tweet_id: curTweetId,
+                text: $textarea.val()
+            })
+            .done(function() {
+                $modal.modal('hide');
+            })
+            .fail(function(jqXHR) {
+                $error.text(jqXHR.responseText).show();
+            })
+            .always(function() {
+                $replyButton.removeClass('loading');
+                $controls.prop('disabled', false);
+            });
+            return false;
+        });
+
+        // Process the tweet actions
+        $('.tweet.actions').each(function() {
+
+            // Retrieve the tweet ID and username
+            var tweetId = $(this).data('tweet-id'),
+                tweetUser = $(this).data('tweet-user');
+
+            // Show the dialog when reply is clicked
+            $(this).find('.reply').click(function() {
+                curTweetId = tweetId;
+                $textarea.val('@' + tweetUser + ' ').focus();
+                $modal.modal('show');
+            });
+
+            // Like the tweet when like is clicked
+            $(this).find('.like').click(function() {
+                var $this = $(this),
+                    $icon = $('.icon', $this),
+                    $error = $('.text-error', $this).hide(),
+                    $spinner = $('<i>').addClass('spinner loading icon');
+                $this.after($spinner).detach();
+                ajax('like', {
+                    tweet_id: tweetId,
+                })
+                .done(function() {
+                    $spinner.replaceWith(
+                        $('<span>')
+                            .text(' Liked')
+                            .prepend($icon)
+                            .addClass('text-success')
+                    );
+                })
+                .fail(function(jqXHR) {
+                    $error.text('(' + jqXHR.responseText + ')').show();
+                    $spinner.after($this).remove();
+                });
+            });
+        });
+
+    </script>
 {% endblock %}

@@ -50,6 +50,7 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	s.render(w, r, "viewaccount.html", pongo2.Context{
 		"title":    a.Name,
+		"account":  a,
 		"mentions": m,
 	})
 }
