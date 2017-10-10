@@ -15,7 +15,10 @@ func (s *Server) suggestions(w http.ResponseWriter, r *http.Request) {
 		order       = "account_id, date"
 		suggestions = []*db.Suggestion{}
 	)
-	if r.FormValue("order") == "votes" {
+	switch r.FormValue("order") {
+	case "author":
+		order = "user_id, account_id, vote_count desc, date"
+	case "votes":
 		order = "account_id, vote_count desc, date"
 	}
 	if err := s.database.C.
