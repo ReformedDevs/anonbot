@@ -75,89 +75,81 @@
     {{ block.Super|safe }}
     <script>
 
-        // Send an ajax request with the specified data
-        function ajax(a, d) {
-            return $.ajax({
-                type: 'POST',
-                url: '/accounts/{{ account.ID }}/ajax',
-                data: JSON.stringify({
-                    action: a,
-                    data: d
+        $(function() {
+
+            // Set up the modal
+            var $modal = $('.reply.modal').modal({
+                    closable: false,
+                    duration: 0
                 }),
-                contentType: 'application/json; charset=utf-8'
+                $error = $('.error', $modal),
+                $textarea = $('textarea', $modal),
+                $replyButton = $('.approve.button', $modal),
+                $controls = $textarea.add($('.button', $modal));
+
+            var curTweetId;
+
+            // Set the handlers
+            $modal.modal('setting', 'onShow', function() {
+                $error.hide();
             });
-        }
-
-        // Set up the modal
-        var $modal = $('.reply.modal').modal({
-                closable: false,
-                duration: 0
-            }),
-            $error = $('.error', $modal),
-            $textarea = $('textarea', $modal),
-            $replyButton = $('.approve.button', $modal),
-            $controls = $textarea.add($('.button', $modal));
-
-        var curTweetId;
-
-        // Set the handlers
-        $modal.modal('setting', 'onShow', function() {
-            $error.hide();
-        });
-        $modal.modal('setting', 'onApprove', function() {
-            $replyButton.addClass('loading');
-            $controls.prop('disabled', true);
-            ajax('reply', {
-                tweet_id: curTweetId,
-                text: $textarea.val()
-            })
-            .done(function() {
-                $modal.modal('hide');
-            })
-            .fail(function(jqXHR) {
-                $error.text(jqXHR.responseText).show();
-            })
-            .always(function() {
-                $replyButton.removeClass('loading');
-                $controls.prop('disabled', false);
-            });
-            return false;
-        });
-
-        // Process the tweet actions
-        $('.tweet.actions').each(function() {
-
-            // Retrieve the tweet ID and username
-            var tweetId = $(this).data('tweet-id'),
-                tweetUser = $(this).data('tweet-user');
-
-            // Show the dialog when reply is clicked
-            $(this).find('.reply').click(function() {
-                curTweetId = tweetId;
-                $textarea.val('@' + tweetUser + ' ').focus();
-                $modal.modal('show');
-            });
-
-            var $like = $(this).find('.like'),
-                $a = $('a', $like),
-                $success = $('.text-success', $like);
-
-            // Like the tweet when clicked
-            $a.click(function() {
-                var $icon = $('.icon', $a),
-                    $error = $('.text-error', $a).hide(),
-                    $spinner = $('<i>').addClass('spinner loading icon');
-                $a.after($spinner).detach();
-                ajax('like', {
-                    tweet_id: tweetId,
+            $modal.modal('setting', 'onApprove', function() {
+                $replyButton.addClass('loading');
+                $controls.prop('disabled', true);
+                window.ajax('reply', {
+                    account_id: "{{ account.ID }}",
+                    tweet_id: curTweetId,
+                    text: $textarea.val()
                 })
                 .done(function() {
-                    $spinner.remove();
-                    $success.removeClass('hidden');
+                    $modal.modal('hide');
                 })
                 .fail(function(jqXHR) {
-                    $error.text('(' + jqXHR.responseText + ')').show();
-                    $spinner.after($a).remove();
+                    $error.text(jqXHR.responseText).show();
+                })
+                .always(function() {
+                    $replyButton.removeClass('loading');
+                    $controls.prop('disabled', false);
+                });
+                return false;
+            });
+
+            // Process the tweet actions
+            $('.tweet.actions').each(function() {
+
+                // Retrieve the tweet ID and username
+                var tweetId = $(this).data('tweet-id'),
+                    tweetUser = $(this).data('tweet-user');
+
+                // Show the dialog when reply is clicked
+                $(this).find('.reply').click(function() {
+                    curTweetId = tweetId;
+                    $textarea.val('@' + tweetUser + ' ').focus();
+                    $modal.modal('show');
+                });
+
+                var $like = $(this).find('.like'),
+                    $a = $('a', $like),
+                    $success = $('.text-success', $like);
+
+                // Like the tweet when clicked
+                $a.click(function() {
+                    var $icon = $('.icon', $a),
+                        $error = $('.text-error', $a).hide(),
+                        $spinner = $('<i>').addClass('spinner loading icon');
+                    $a.after($spinner).detach();
+                    window.ajax('like', {
+                        account_id: "{{ account.ID }}",
+                        tweet_id: tweetId
+                    })
+                    .done(function() {
+                        $spinner.remove();
+                        $success.removeClass('hidden');
+                    })
+                    .fail(function(jqXHR) {
+                        $error.text('(' + jqXHR.responseText + ')').show();
+                        $spinner.after($a).remove();
+                    });
                 });
             });
         });

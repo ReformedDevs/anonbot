@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/ReformedDevs/anonbot/db"
-	"github.com/gorilla/mux"
 )
 
 type ajaxAction struct {
@@ -15,23 +14,19 @@ type ajaxAction struct {
 }
 
 type ajaxActionReply struct {
-	TweetID string `json:"tweet_id"`
-	Text    string `json:"text"`
+	AccountID string `json:"account_id"`
+	TweetID   string `json:"tweet_id"`
+	Text      string `json:"text"`
 }
 
 type ajaxActionLike struct {
-	TweetID string `json:"tweet_id"`
+	AccountID string `json:"account_id"`
+	TweetID   string `json:"tweet_id"`
 }
 
-func (s *Server) ajaxAccount(w http.ResponseWriter, r *http.Request) {
-	var (
-		id = mux.Vars(r)["id"]
-		a  = &db.Account{}
-	)
-	if err := s.database.C.Find(a, id).Error; err != nil {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
+// TODO: this could probably be refactored a bit
+
+func (s *Server) ajax(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
@@ -43,9 +38,18 @@ func (s *Server) ajaxAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	switch action.Action {
 	case "reply":
+		if !r.Context().Value(contextUser).(*db.User).IsAdmin {
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
+		}
 		reply := &ajaxActionReply{}
 		if err := json.Unmarshal(action.Data, reply); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		a := &db.Account{}
+		if err := s.database.C.Find(a, reply.AccountID).Error; err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
 		if err := s.tweeter.Reply(a, reply.TweetID, reply.Text); err != nil {
@@ -53,9 +57,18 @@ func (s *Server) ajaxAccount(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case "like":
+		if !r.Context().Value(contextUser).(*db.User).IsAdmin {
+			http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+			return
+		}
 		like := &ajaxActionLike{}
 		if err := json.Unmarshal(action.Data, like); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		a := &db.Account{}
+		if err := s.database.C.Find(a, like.AccountID).Error; err != nil {
+			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			return
 		}
 		tweetID, _ := strconv.ParseInt(like.TweetID, 10, 64)
@@ -63,6 +76,9 @@ func (s *Server) ajaxAccount(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+	default:
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
 	w.Header().Set("Content-Length", "0")
 	w.WriteHeader(http.StatusOK)
