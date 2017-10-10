@@ -29,7 +29,18 @@ anonbot requires an SQL database (currently limited to PostgreSQL) which must be
         --db-args 'dbname=postgres user=postgres' \
         migrate
 
-Once the migration completes, you can run the command above without "migration" to launch the web server. By default, the application is accessible on port 8000.
+Once the migration completes, the command to launch the web server would look like this:
+
+    dist/anonbot \
+        --db-driver postgres \
+        --db-args 'dbname=postgres user=postgres' \
+        --secret-key abcdefg \
+        --server-addr :8000 \
+        --server-url 'http://example.com' \
+        --twitter-consumer-key abcdefg \
+        --twitter-consumer-secret abcdefg
+
+Visit [apps.twitter.com](https://apps.twitter.com) to register an application and obtain the consumer key and secret for the command above.
 
 ### Using with Docker
 
