@@ -32,11 +32,17 @@
                                 Reply
                             </a>
                             &nbsp;
-                            <a href="#" class="like">
-                                <i class="heart icon"></i>
-                                Like
-                                <span class="text-error"></span>
-                            </a>
+                            <span class="like">
+                                <a href="#"{% if m.Favorited %} class="hidden"{% endif %}>
+                                    <i class="heart icon"></i>
+                                    Like
+                                    <span class="text-error"></span>
+                                </a>
+                                <span class="text-success{% if not m.Favorited %} hidden{% endif %}">
+                                    <i class="heart icon"></i>
+                                    Liked
+                                </span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -92,7 +98,6 @@
             $replyButton = $('.approve.button', $modal),
             $controls = $textarea.add($('.button', $modal));
 
-        // Current tweet ID
         var curTweetId;
 
         // Set the handlers
@@ -133,27 +138,26 @@
                 $modal.modal('show');
             });
 
-            // Like the tweet when like is clicked
-            $(this).find('.like').click(function() {
-                var $this = $(this),
-                    $icon = $('.icon', $this),
-                    $error = $('.text-error', $this).hide(),
+            var $like = $(this).find('.like'),
+                $a = $('a', $like),
+                $success = $('.text-success', $like);
+
+            // Like the tweet when clicked
+            $a.click(function() {
+                var $icon = $('.icon', $a),
+                    $error = $('.text-error', $a).hide(),
                     $spinner = $('<i>').addClass('spinner loading icon');
-                $this.after($spinner).detach();
+                $a.after($spinner).detach();
                 ajax('like', {
                     tweet_id: tweetId,
                 })
                 .done(function() {
-                    $spinner.replaceWith(
-                        $('<span>')
-                            .text(' Liked')
-                            .prepend($icon)
-                            .addClass('text-success')
-                    );
+                    $spinner.remove();
+                    $success.removeClass('hidden');
                 })
                 .fail(function(jqXHR) {
                     $error.text('(' + jqXHR.responseText + ')').show();
-                    $spinner.after($this).remove();
+                    $spinner.after($a).remove();
                 });
             });
         });

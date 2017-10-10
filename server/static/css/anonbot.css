@@ -22,6 +22,10 @@ textarea {
     width: 100%;
 }
 
+.hidden {
+    display: none !important;
+}
+
 .text-error {
     color: #db2828;
 }
