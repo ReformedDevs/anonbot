@@ -12,13 +12,17 @@ import (
 func (s *Server) suggestions(w http.ResponseWriter, r *http.Request) {
 	var (
 		u           = r.Context().Value(contextUser).(*db.User)
+		order       = "account_id, date"
 		suggestions = []*db.Suggestion{}
 	)
+	if r.FormValue("order") == "votes" {
+		order = "account_id, vote_count desc"
+	}
 	if err := s.database.C.
 		Preload("User").
 		Preload("Account").
 		Preload("Votes", "user_id = ?", u.ID).
-		Order("date").
+		Order(order).
 		Find(&suggestions).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
