@@ -37,6 +37,7 @@ func (c *Connection) Migrate() error {
 		&Account{},
 		&Suggestion{},
 		&QueueItem{},
+		&Tweet{},
 		&Vote{},
 	).Error
 }
