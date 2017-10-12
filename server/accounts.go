@@ -34,10 +34,19 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	t := []*db.Tweet{}
+	if err := s.database.C.
+		Preload("User").
+		Order("date desc").
+		Find(&t).Error; err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	s.render(w, r, "viewaccount.html", pongo2.Context{
 		"title":    a.Name,
 		"account":  a,
 		"mentions": m,
+		"tweets":   t,
 	})
 }
 

@@ -6,52 +6,89 @@
         <p>Use the tools below to interact with the account:</p>
         <h4 class="ui dividing header">Tweet</h4>
         <p>Send a tweet directly from the account using the button below:</p>
-        <a href="#" class="ui labeled icon primary button tweet">
-            <i class="twitter icon"></i>
-            Tweet
-        </a>
-        <h4 class="ui dividing header">Mentions</h4>
-        <div class="ui comments">
-            {% for m in mentions %}
-                {% if forloop.Counter0 %}
-                    <div class="ui divider"></div>
-                {% endif %}
-                <div class="comment">
-                    <a class="avatar">
-                        <img src="{{ m.User.ProfileImageURL }}">
-                    </a>
-                    <div class="content">
-                        <a class="author">{{ m.User.Name }}</a>
-                        <div class="metadata">
-                            <a href="https://twitter.com/statuses/{{ m.Id }}" target="_blank" class="date">
-                                {{ m.CreatedAt }}
+        <p>
+            <a href="#" class="ui labeled icon primary button tweet">
+                <i class="twitter icon"></i>
+                Tweet
+            </a>
+        </p>
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h4 class="ui dividing header">Tweets</h4>
+                <div class="ui comments">
+                    {% for t in tweets %}
+                        {% if forloop.Counter0 %}
+                            <div class="ui divider"></div>
+                        {% endif %}
+                        <div class="comment">
+                            <a class="avatar">
+                                <img src="//gravatar.com/avatar/{{ t.User.Email|md5 }}?s=32&d=identicon">
                             </a>
+                            <div class="content">
+                                <a class="author">{{ t.User.Username }}</a>
+                                <div class="metadata">
+                                    <a href="https://twitter.com/statuses/{{ t.TweetID }}" target="_blank" class="date">
+                                        {{ t.Date|timesince }}
+                                    </a>
+                                </div>
+                                <div class="text">
+                                    <p>{{ t.Text }}</p>
+                                    {% if t.MediaURL|length %}
+                                        <p>
+                                            <img src="{{ t.MediaURL }}" class="ui image">
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                        <div class="text">
-                            {{ m.Text }}
-                        </div>
-                        <div class="tweet actions"
-                             data-tweet-id="{{ m.Id }}"
-                             data-tweet-user="{{ m.User.ScreenName }}">
-                            <a href="#" class="reply">
-                                <i class="reply icon"></i>
-                                Reply
-                            </a>
-                            &nbsp;
-                            <span class="like">
-                                <a href="#"{% if m.Favorited %} class="hidden"{% endif %}>
-                                    <i class="heart icon"></i>
-                                    Like
-                                </a>
-                                <span class="text-success{% if not m.Favorited %} hidden{% endif %}">
-                                    <i class="heart icon"></i>
-                                    Liked
-                                </span>
-                            </span>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
+            <div class="eight wide column">
+                <h4 class="ui dividing header">Mentions</h4>
+                <div class="ui comments">
+                    {% for m in mentions %}
+                        {% if forloop.Counter0 %}
+                            <div class="ui divider"></div>
+                        {% endif %}
+                        <div class="comment">
+                            <a class="avatar">
+                                <img src="{{ m.User.ProfileImageURL }}">
+                            </a>
+                            <div class="content">
+                                <a class="author">{{ m.User.Name }}</a>
+                                <div class="metadata">
+                                    <a href="https://twitter.com/statuses/{{ m.Id }}" target="_blank" class="date">
+                                        {{ m.CreatedAt }}
+                                    </a>
+                                </div>
+                                <div class="text">
+                                    {{ m.Text }}
+                                </div>
+                                <div class="tweet actions"
+                                     data-tweet-id="{{ m.Id }}"
+                                     data-tweet-user="{{ m.User.ScreenName }}">
+                                    <a href="#" class="reply">
+                                        <i class="reply icon"></i>
+                                        Reply
+                                    </a>
+                                    &nbsp;
+                                    <span class="like">
+                                        <a href="#"{% if m.Favorited %} class="hidden"{% endif %}>
+                                            <i class="heart icon"></i>
+                                            Like
+                                        </a>
+                                        <span class="text-success{% if not m.Favorited %} hidden{% endif %}">
+                                            <i class="heart icon"></i>
+                                            Liked
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 
