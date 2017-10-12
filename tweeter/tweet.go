@@ -43,10 +43,11 @@ func (t *Tweeter) tweet(c *db.Connection, a *db.Account, q *db.QueueItem) error 
 		mediaURL = i.Entities.Media[0].Media_url_https
 	}
 	return c.C.Save(&db.Tweet{
-		TweetID:  i.Id,
-		Date:     time.Now(),
-		Text:     q.Text,
-		MediaURL: mediaURL,
-		UserID:   q.UserID,
+		TweetID:   i.Id,
+		Date:      time.Now(),
+		Text:      q.Text,
+		MediaURL:  mediaURL,
+		UserID:    q.UserID,
+		AccountID: a.ID,
 	}).Error
 }
