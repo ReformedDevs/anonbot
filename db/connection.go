@@ -35,6 +35,7 @@ func (c *Connection) Migrate() error {
 	return c.C.AutoMigrate(
 		&User{},
 		&Account{},
+		&Schedule{},
 		&Suggestion{},
 		&QueueItem{},
 		&Tweet{},
