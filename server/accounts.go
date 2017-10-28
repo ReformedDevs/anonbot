@@ -51,8 +51,7 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 type editAccountForm struct {
-	Name          string
-	TweetInterval int64
+	Name string
 }
 
 func (s *Server) editAccount(w http.ResponseWriter, r *http.Request) {
@@ -60,10 +59,8 @@ func (s *Server) editAccount(w http.ResponseWriter, r *http.Request) {
 		var (
 			id   = mux.Vars(r)["id"]
 			a    = &db.Account{}
-			form = &editAccountForm{
-				TweetInterval: 86400,
-			}
-			ctx = pongo2.Context{
+			form = &editAccountForm{}
+			ctx  = pongo2.Context{
 				"form": form,
 			}
 		)
@@ -86,7 +83,6 @@ func (s *Server) editAccount(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return nil
 			}
-			s.tweeter.Trigger(nil)
 			http.Redirect(w, r, "/accounts", http.StatusFound)
 			return nil
 		}

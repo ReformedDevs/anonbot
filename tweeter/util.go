@@ -6,39 +6,44 @@ import (
 	"github.com/ReformedDevs/anonbot/db"
 )
 
-func (t *Tweeter) selectAccount(c *db.Connection) *db.Account {
-	a := &db.Account{}
+// selectSchedule attempts to find a schedule for an account whose next tweet
+// should have been sent in the past or present. The Account member is filled
+// in.
+func (t *Tweeter) selectSchedule(c *db.Connection) *db.Schedule {
+	s := &db.Schedule{}
 	if err := c.C.
-		Where("queue_length > 0").
-		Where("last_tweet + tweet_interval <= ?", time.Now().Unix()).
-		First(a).Error; err != nil {
+		Preload("Account").
+		Order("next_run").
+		Where("next_run <= ?", time.Now()).
+		First(s).Error; err != nil {
 		return nil
 	}
-	return a
+	return s
 }
 
-func (t *Tweeter) selectQueuedItem(c *db.Connection, a *db.Account) *db.QueueItem {
+// selectQueuedItem retrieves the next available suggestion for the specified
+// schedule.
+func (t *Tweeter) selectQueuedItem(c *db.Connection, s *db.Schedule) *db.QueueItem {
 	q := &db.QueueItem{}
 	if err := c.C.
 		Order("date").
-		Where("account_id = ?", a.ID).
+		Where("account_id = ?", s.AccountID).
 		First(q).Error; err != nil {
 		return nil
 	}
 	return q
 }
 
+// nextTweetCh creates a channel that sends when the next tweet should be sent.
 func (t *Tweeter) nextTweetCh(c *db.Connection) <-chan time.Time {
-	a := &db.Account{}
+	s := &db.Schedule{}
 	if err := c.C.
-		Select("*, last_tweet + tweet_interval AS next_tweet_time").
-		Order("next_tweet_time").
-		Where("queue_length > 0").
-		First(a).Error; err != nil {
-		t.log.Debug("no upcoming tweets")
+		Preload("Account").
+		Order("next_run").
+		First(s).Error; err != nil {
 		return nil
 	}
-	nextTweet := time.Unix(a.LastTweet+a.TweetInterval, 0).Sub(time.Now())
-	t.log.Debugf("next tweet from %s in %s", a.Name, nextTweet.String())
+	nextTweet := s.NextRun.Sub(time.Now())
+	t.log.Debugf("next tweet from %s in %s", s.Account.Name, nextTweet.String())
 	return time.After(nextTweet)
 }

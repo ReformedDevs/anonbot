@@ -25,17 +25,17 @@ func (t *Tweeter) run() {
 	defer close(t.stoppedCh)
 	defer t.log.Info("tweeter has stopped")
 	t.log.Info("starting tweeter...")
-	var a *db.Account
+	var s *db.Schedule
 	for {
 		var nextTweetCh <-chan time.Time
 		err := t.database.Transaction(func(c *db.Connection) error {
-			if a == nil {
-				a = t.selectAccount(c)
+			if s == nil {
+				s = t.selectSchedule(c)
 			}
-			if a != nil {
-				q := t.selectQueuedItem(c, a)
+			if s != nil {
+				q := t.selectQueuedItem(c, s)
 				if q != nil {
-					if err := t.tweet(c, a, q); err != nil {
+					if err := t.tweet(c, s, q); err != nil {
 						return err
 					}
 				}
@@ -54,11 +54,11 @@ func (t *Tweeter) run() {
 				return
 			}
 			if forceAccount != nil {
-				a = forceAccount
+				s = &db.Schedule{Account: forceAccount}
 				continue
 			}
 		}
-		a = nil
+		s = nil
 	}
 }
 

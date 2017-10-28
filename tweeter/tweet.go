@@ -8,17 +8,22 @@ import (
 	"github.com/ReformedDevs/anonbot/db"
 )
 
-func (t *Tweeter) tweet(c *db.Connection, a *db.Account, q *db.QueueItem) error {
+func (t *Tweeter) tweet(c *db.Connection, s *db.Schedule, q *db.QueueItem) error {
 	if err := c.C.Delete(q).Error; err != nil {
 		return err
 	}
-	a.QueueLength--
-	a.LastTweet = time.Now().Unix()
-	if err := c.C.Save(a).Error; err != nil {
+	s.Account.QueueLength--
+	if err := c.C.Save(s.Account).Error; err != nil {
+		return err
+	}
+	if err := s.Calculate(); err != nil {
+		return err
+	}
+	if err := c.C.Save(s).Error; err != nil {
 		return err
 	}
 	var (
-		api = anaconda.NewTwitterApi(a.AccessToken, a.AccessSecret)
+		api = anaconda.NewTwitterApi(s.Account.AccessToken, s.Account.AccessSecret)
 		v   = url.Values{}
 	)
 	if len(q.MediaURL) != 0 {
@@ -33,7 +38,7 @@ func (t *Tweeter) tweet(c *db.Connection, a *db.Account, q *db.QueueItem) error 
 		}
 		v.Set("media_ids", m.MediaIDString)
 	}
-	t.log.Infof("posting tweet for %s...", a.Name)
+	t.log.Infof("posting tweet for %s...", s.Account.Name)
 	i, err := api.PostTweet(q.Text, v)
 	if err != nil {
 		return err
@@ -48,6 +53,6 @@ func (t *Tweeter) tweet(c *db.Connection, a *db.Account, q *db.QueueItem) error 
 		Text:      q.Text,
 		MediaURL:  mediaURL,
 		UserID:    q.UserID,
-		AccountID: a.ID,
+		AccountID: s.AccountID,
 	}).Error
 }
