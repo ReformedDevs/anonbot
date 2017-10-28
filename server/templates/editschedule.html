@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>{{ title }}</h2>
+        <p>Use the form below to create or edit a schedule:</p>
+        {% if error %}
+            <div class="ui negative message">
+                Error: {{ error }}
+            </div>
+        {% endif %}
+        <form class="ui form" method="post">
+            <div class="field">
+                <select class="ui fluid dropdown" name="AccountID">
+                    {% for a in accounts %}
+                        <option value="{{ a.ID }}">{{ a.Name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="calendar icon"></i>
+                    <input type="text" placeholder="Cron" name="Cron" value="{{ form.Cron }}">
+                </div>
+            </div>
+            <button type="submit" class="ui primary button">{{ action }}</button>
+        </form>
+    </div>
+{% endblock %}

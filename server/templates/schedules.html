@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="ui container">
+        <h2>Schedules</h2>
+        <p>Use the table below to manage schedules:</p>
+        <table class="ui table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Cron</th>
+                    <th>Next Run</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in schedules %}
+                    <tr>
+                        <td>{{ s.Account.Name }}</td>
+                        <td>{{ s.Cron }}</td>
+                        <td>{{ s.NextRun|timesince }}</td>
+                        <td class="collapsing">
+                            <a href="/schedules/{{ s.ID }}/edit" class="ui mini button">
+                                Edit
+                            </a>
+                            <a href="/schedules/{{ s.ID }}/delete" class="ui negative mini button">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="disabled">
+                        <td colspan="4">
+                            No schedules
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4">
+                        <a href="/schedules/new" class="ui primary mini button">
+                            New
+                        </a>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+{% endblock %}
