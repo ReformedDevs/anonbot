@@ -54,7 +54,10 @@ func (t *Tweeter) run() {
 				return
 			}
 			if forceAccount != nil {
-				s = &db.Schedule{Account: forceAccount}
+				s = &db.Schedule{
+					Account:   forceAccount,
+					AccountID: forceAccount.ID,
+				}
 				continue
 			}
 		}
