@@ -39,7 +39,8 @@ func (t *Tweeter) nextTweetCh(c *db.Connection) <-chan time.Time {
 	s := &db.Schedule{}
 	if err := c.C.
 		Preload("Account").
-		Order("next_run").
+		Joins("LEFT JOIN accounts ON schedules.account_id = accounts.id").
+		Where("accounts.queue_length > 0").
 		First(s).Error; err != nil {
 		return nil
 	}
