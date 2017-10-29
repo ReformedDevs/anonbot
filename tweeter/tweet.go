@@ -16,11 +16,13 @@ func (t *Tweeter) tweet(c *db.Connection, s *db.Schedule, q *db.QueueItem) error
 	if err := c.C.Save(s.Account).Error; err != nil {
 		return err
 	}
-	if err := s.Calculate(); err != nil {
-		return err
-	}
-	if err := c.C.Save(s).Error; err != nil {
-		return err
+	if s.ID != nil {
+		if err := s.Calculate(); err != nil {
+			return err
+		}
+		if err := c.C.Save(s).Error; err != nil {
+			return err
+		}
 	}
 	var (
 		api = anaconda.NewTwitterApi(s.Account.AccessToken, s.Account.AccessSecret)
