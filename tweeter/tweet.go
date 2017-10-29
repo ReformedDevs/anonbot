@@ -16,7 +16,7 @@ func (t *Tweeter) tweet(c *db.Connection, s *db.Schedule, q *db.QueueItem) error
 	if err := c.C.Save(s.Account).Error; err != nil {
 		return err
 	}
-	if s.ID != nil {
+	if s.ID != 0 {
 		if err := s.Calculate(); err != nil {
 			return err
 		}
