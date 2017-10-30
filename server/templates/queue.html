@@ -22,8 +22,8 @@
                         <td>{{ q.Account.Name }}</td>
                         <td>{{ q.Text }}</td>
                         <td class="center aligned">
-                            {% if s.MediaURL %}
-                                <a href="{{ s.MediaURL }}" target="_blank">
+                            {% if q.MediaURL %}
+                                <a href="{{ q.MediaURL }}" target="_blank">
                                     <i class="external icon"></i>
                                 </a>
                             {% endif %}
