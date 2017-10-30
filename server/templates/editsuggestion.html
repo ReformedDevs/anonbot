@@ -13,7 +13,9 @@
             <div class="field">
                 <select class="ui fluid dropdown" name="AccountID">
                     {% for a in accounts %}
-                        <option value="{{ a.ID }}">{{ a.Name }}</option>
+                        <option value="{{ a.ID }}"{% if form.AccountID == a.ID %} selected="selected"{% endif %}>
+                            {{ a.Name }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
