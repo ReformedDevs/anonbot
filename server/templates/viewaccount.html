@@ -162,6 +162,7 @@
                 curTweetId = '';
                 $textarea.val('').focus();
                 $modal.modal('show');
+                return false;
             });
 
             // Process the individual tweet actions
@@ -176,6 +177,7 @@
                     curTweetId = tweetId;
                     $textarea.val('@' + tweetUser + ' ').focus();
                     $modal.modal('show');
+                    return false;
                 });
 
                 var $like = $(this).find('.like'),
@@ -197,6 +199,7 @@
                             window.error(jqXHR.responseText);
                         })
                     );
+                    return false;
                 });
             });
         });
