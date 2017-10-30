@@ -38,6 +38,7 @@ func (s *Server) viewAccount(w http.ResponseWriter, r *http.Request) {
 	if err := s.database.C.
 		Preload("User").
 		Order("date desc").
+		Where("account_id = ?", id).
 		Find(&t).Error; err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
