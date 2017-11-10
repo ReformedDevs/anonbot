@@ -37,7 +37,7 @@
                                 <span class="count">{{ s.VoteCount }}</span>
                             </div>
                         </td>
-                        <td>{{ s.Text }}</td>
+                        <td>{{ s.Text|linebreaksbr|safe }}</td>
                         <td class="center aligned">
                             {% if s.MediaURL %}
                                 <a href="{{ s.MediaURL }}" target="_blank">

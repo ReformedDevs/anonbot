@@ -33,7 +33,7 @@
                                     </a>
                                 </div>
                                 <div class="text">
-                                    <p>{{ t.Text }}</p>
+                                    <p>{{ t.Text|linebreaksbr|safe }}</p>
                                     {% if t.MediaURL|length %}
                                         <p>
                                             <img src="{{ t.MediaURL }}" class="ui image">
@@ -64,7 +64,7 @@
                                     </a>
                                 </div>
                                 <div class="text">
-                                    {{ m.Text }}
+                                    {{ m.Text|linebreaksbr|safe }}
                                 </div>
                                 <div class="tweet actions"
                                      data-tweet-id="{{ m.Id }}"
