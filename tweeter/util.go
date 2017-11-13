@@ -34,7 +34,7 @@ func (t *Tweeter) selectQueuedItem(c *db.Connection, s *db.Schedule) (*db.QueueI
 			if err := s.Calculate(); err != nil {
 				return nil, err
 			}
-			if err := c.C.Save(q).Error; err != nil {
+			if err := c.C.Save(s).Error; err != nil {
 				return nil, err
 			}
 		}
