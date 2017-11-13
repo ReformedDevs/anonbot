@@ -33,7 +33,10 @@ func (t *Tweeter) run() {
 				s = t.selectSchedule(c)
 			}
 			if s != nil {
-				q := t.selectQueuedItem(c, s)
+				q, err := t.selectQueuedItem(c, s)
+				if err != nil {
+					return err
+				}
 				if q != nil {
 					if err := t.tweet(c, s, q); err != nil {
 						return err

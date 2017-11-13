@@ -22,16 +22,25 @@ func (t *Tweeter) selectSchedule(c *db.Connection) *db.Schedule {
 }
 
 // selectQueuedItem retrieves the next available suggestion for the specified
-// schedule.
-func (t *Tweeter) selectQueuedItem(c *db.Connection, s *db.Schedule) *db.QueueItem {
+// schedule. If no item is available, the schedule is updated to its next time
+// slot.
+func (t *Tweeter) selectQueuedItem(c *db.Connection, s *db.Schedule) (*db.QueueItem, error) {
 	q := &db.QueueItem{}
 	if err := c.C.
 		Order("date").
 		Where("account_id = ?", s.AccountID).
 		First(q).Error; err != nil {
-		return nil
+		if s.ID != 0 {
+			if err := s.Calculate(); err != nil {
+				return nil, err
+			}
+			if err := c.C.Save(q).Error; err != nil {
+				return nil, err
+			}
+		}
+		return nil, nil
 	}
-	return q
+	return q, nil
 }
 
 // nextTweetCh creates a channel that sends when the next tweet should be sent.
