@@ -48,8 +48,9 @@ func (t *Tweeter) run() {
 		})
 		if err != nil {
 			t.log.Error(err.Error())
-			nextTweetCh = time.After(30 * time.Second)
+			nextTweetCh = time.After(60 * time.Second)
 		}
+		s = nil
 		select {
 		case <-nextTweetCh:
 		case forceAccount, ok := <-t.triggerCh:
@@ -61,10 +62,8 @@ func (t *Tweeter) run() {
 					Account:   forceAccount,
 					AccountID: forceAccount.ID,
 				}
-				continue
 			}
 		}
-		s = nil
 	}
 }
 
